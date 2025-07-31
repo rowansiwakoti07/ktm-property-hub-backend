@@ -2,9 +2,13 @@
 
 from django.db import models
 from django.conf import settings # To link to the User model
+from cloudinary.models import CloudinaryField
 
 class Facility(models.Model):
-    """A model to store individual facilities that can be linked to a property."""
+    """
+    A model to store individual, admin-approved facilities. This populates
+    the checklist on the frontend.
+    """
     name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
@@ -152,9 +156,21 @@ class PropertyListing(models.Model):
     rent_duration_unit = models.CharField(max_length=10, choices=[('MONTHS', 'Months'), ('YEARS', 'Years')], blank=True, null=True)
     rent_period = models.CharField(max_length=10, choices=[('MONTHLY', 'Monthly'), ('YEARLY', 'Yearly')], blank=True, null=True)
 
-    # --- Facilities (Relational) ---
-    facilities = models.ManyToManyField(Facility, blank=True)
-    other_facilities = models.TextField(blank=True, null=True, help_text="Manually added facilities, comma-separated.")
+    # --- THE HYBRID MODEL FOR FACILITIES (Structured + Flexible) ---
+    
+    # 1. FOR PREDEFINED FACILITIES (The Checklist/Dropdown)
+    facilities = models.ManyToManyField(
+        Facility, 
+        blank=True,
+        help_text="Select the available facilities from the predefined list."
+    )
+
+    # 2. FOR CUSTOM FACILITIES (The 'Other' Text Box)
+    other_facilities = models.TextField(
+        blank=True, 
+        null=True, 
+        help_text="Enter any additional facilities that are not in the list, separated by commas (e.g. Rooftop Garden, Servant Quarters)."
+    )
 
 
     def __str__(self):
@@ -162,3 +178,43 @@ class PropertyListing(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+
+
+# ==============================================================================
+# NEW MODEL FOR HANDLING PROPERTY IMAGES
+# ==============================================================================
+class PropertyImage(models.Model):
+    """
+    A model to store images associated with a single property listing.
+    This allows for multiple images per property.
+    """
+    property_listing = models.ForeignKey(
+        'PropertyListing', 
+        on_delete=models.CASCADE, 
+        related_name='images',
+        help_text="The property this image belongs to."
+    )
+    
+    # This is the magic field from the cloudinary-django library.
+    # It will handle uploading to Cloudinary and store the image URL.
+    image = CloudinaryField(
+        'image',
+        folder='property_images', # Optional: Organizes images in a Cloudinary folder
+        overwrite=True,
+        resource_type='image'
+    )
+
+    caption = models.CharField(
+        max_length=255, 
+        blank=True, 
+        null=True,
+        help_text="An optional caption for the image."
+    )
+    
+    is_thumbnail = models.BooleanField(
+        default=False,
+        help_text="Is this the main display image for the property?"
+    )
+
+    def __str__(self):
+        return f"Image for property: {self.property_listing.title}"

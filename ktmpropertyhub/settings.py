@@ -37,8 +37,12 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'cloudinary_storage',
     'django.contrib.staticfiles',
-    'ktmpropertyhub'
+    'cloudinary',
+    'ktmpropertyhub',
+    'rest_framework',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -72,23 +76,6 @@ WSGI_APPLICATION = 'ktmpropertyhub.wsgi.application'
 
 
 # Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-# DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.lgvqecqqggeekyspxrcn.supabase.co:5432/postgres
-# host:
-# aws-0-ap-south-1.pooler.supabase.com
-
-# port:
-# 6543
-
-# database:
-# postgres
-
-# user:
-# postgres.lgvqecqqggeekyspxrcn
-
-# pool_mode:
-# transaction
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -141,3 +128,15 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# --- CLOUDINARY CONFIGURATION ---
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': config('CLOUDINARY_API_KEY'),
+    'API_SECRET': config('CLOUDINARY_API_SECRET'),
+}
+
+# --- DEFAULT FILE STORAGE CONFIGURATION ---
+# This tells Django to use Cloudinary for all media files by default.
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
