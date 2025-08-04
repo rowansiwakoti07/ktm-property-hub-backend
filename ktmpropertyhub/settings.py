@@ -130,7 +130,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 # if config('ENVTYPE') == 'dev':
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Use this for Vercel
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_build')  # Use this for Vercel
  
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
