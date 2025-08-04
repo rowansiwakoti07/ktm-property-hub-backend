@@ -1,38 +1,23 @@
-# """
-# URL configuration for ktmpropertyhub project.
+# ktmpropertyhub/ktmpropertyhub/urls.py
+# This is now the single, main URL configuration for your entire project.
 
-# The `urlpatterns` list routes URLs to views. For more information please see:
-#     https://docs.djangoproject.com/en/5.2/topics/http/urls/
-# Examples:
-# Function views
-#     1. Add an import:  from my_app import views
-#     2. Add a URL to urlpatterns:  path('', views.home, name='home')
-# Class-based views
-#     1. Add an import:  from other_app.views import Home
-#     2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-# Including another URLconf
-#     1. Import the include() function: from django.urls import include, path
-#     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-# """
-# from django.contrib import admin
-# from django.urls import path
-
-# urlpatterns = [
-#     path('admin/', admin.site.urls),
-# ]
-
-
-# ktmpropertyhub/urls.py
-
+from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import PropertyListingViewSet
 
-# Create a router and register our viewsets with it.
+# --- API ROUTER CONFIGURATION ---
+# Create a router to automatically generate the API URLs.
 router = DefaultRouter()
 router.register(r'properties', PropertyListingViewSet, basename='propertylisting')
 
-# The API URLs are now determined automatically by the router.
+# --- MAIN URL PATTERNS ---
+# This is the master list of URL patterns for your project.
 urlpatterns = [
-    path('', include(router.urls)),
+    # 1. The URL for the Django Admin Panel
+    path('admin/', admin.site.urls),
+
+    # 2. The URLs for your API, nested under the '/api/' path
+    # This will include '/api/properties/', '/api/properties/<id>/', etc.
+    path('api/', include(router.urls)),
 ]
