@@ -29,7 +29,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     'www.ktmpropertyhub.com',
-    '.vercel.app'
+    '.vercel.app',
+    '.now.sh'
 ]
 
 
