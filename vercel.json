@@ -1,25 +1,13 @@
-{
-  "builds": [
-    {
+ {
+  "builds": [{
       "src": "ktmpropertyhub/wsgi.py",
       "use": "@vercel/python",
-      "config": {
-        "maxLambdaSize": "15mb",
-        "runtime": "python3.12"
-      }
-    },
-    {
-      "src": "build_files.sh",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "staticfiles_build"
-      }
-    }
-  ],
+      "config": { "maxLambdaSize": "15mb", "runtime": "python3.12" }
+  }],
   "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "ktmpropertyhub/wsgi.py"
-    }
+      {
+          "src": "/(.*)",
+          "dest": "ktmpropertyhub/wsgi.py"
+      }
   ]
 }
