@@ -33,6 +33,13 @@ ALLOWED_HOSTS = [
     '.now.sh'
 ]
 
+# --- CORS HEADERS CONFIGURATION ---
+# This is the list of origins that are allowed to make cross-site HTTP requests.
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:4200',
+    'https://ktmpropertyhub.com'
+]
 
 # Application definition
 
@@ -45,12 +52,14 @@ INSTALLED_APPS = [
     'cloudinary_storage',
     'django.contrib.staticfiles',
     'cloudinary',
+    'corsheaders',
     'ktmpropertyhub',
     'rest_framework',
     'django_filters',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
