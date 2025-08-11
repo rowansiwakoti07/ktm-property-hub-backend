@@ -36,6 +36,9 @@ class PropertyListingAdmin(admin.ModelAdmin):
         super().save_model(request, obj, form, change)
     
         files = request.FILES.getlist('upload_new_images')
+
+        print(f"Uploaded files: {files}")
+        print(isinstance(files, list))
         if files:
             prop_title_slug = slugify(obj.title)
             folder_path = f"property_images/{obj.id}-{prop_title_slug}"
