@@ -40,7 +40,7 @@ class PropertyListingAdmin(admin.ModelAdmin):
 
         if files:
             prop_title_slug = slugify(obj.title)
-            folder_path = f"property_images/{obj.id}-{prop_title_slug}"
+            folder_path = f"property_images/{obj.id}-{prop_title_slug}/"
 
             for image_file in files:
                 # --- THIS IS THE DEFINITIVE FIX ---
