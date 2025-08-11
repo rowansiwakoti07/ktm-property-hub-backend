@@ -81,25 +81,25 @@ class PropertyListingAdmin(admin.ModelAdmin):
     #                 print(f"Invalid file object: {image_file}")
 
 
-    def get_existing_images_preview(self, obj):
-        # FIX FOR PREVIEWS: We now iterate through the existing images correctly.
-        if not obj.pk:
-            return "(No images yet)"
+    # def get_existing_images_preview(self, obj):
+    #     # FIX FOR PREVIEWS: We now iterate through the existing images correctly.
+    #     if not obj.pk:
+    #         return "(No images yet)"
         
-        previews = []
-        # obj.images.all() correctly uses the related_name from the model
-        for img in obj.images.all():
-            # The 'image' attribute on the model instance is a CloudinaryResource object.
-            # We can build a thumbnail URL directly from it.
-            if img.image:
-                thumbnail_url = img.image.build_url(height=100, width=100, crop="fill")
-                previews.append(f'<a href="{img.image.url}" target="_blank"><img src="{thumbnail_url}" style="margin-right: 10px;" /></a>')
+    #     previews = []
+    #     # obj.images.all() correctly uses the related_name from the model
+    #     for img in obj.images.all():
+    #         # The 'image' attribute on the model instance is a CloudinaryResource object.
+    #         # We can build a thumbnail URL directly from it.
+    #         if img.image:
+    #             thumbnail_url = img.image.build_url(height=100, width=100, crop="fill")
+    #             previews.append(f'<a href="{img.image.url}" target="_blank"><img src="{thumbnail_url}" style="margin-right: 10px;" /></a>')
         
-        return format_html(''.join(previews)) if previews else "(No images yet)"
+    #     return format_html(''.join(previews)) if previews else "(No images yet)"
     
-    get_existing_images_preview.short_description = "Image Previews"
+    # get_existing_images_preview.short_description = "Image Previews"
 
-    def image_count(self, obj):
-        return obj.images.count()
+    # def image_count(self, obj):
+    #     return obj.images.count()
     
-    image_count.short_description = 'Images'
+    # image_count.short_description = 'Images'
