@@ -50,9 +50,9 @@ class PropertyListingAdmin(admin.ModelAdmin):
             return "(No images yet)"
         
         previews = []
-        import cloudinary
         for img in obj.images.all():
             if img.image and hasattr(img.image, 'url'):
+                import cloudinary
                 thumbnail_url = cloudinary.CloudinaryImage(img.image.public_id).build_url(height=100, width=100, crop="fill")
                 previews.append(f'<a href="{img.image.url}" target="_blank"><img src="{thumbnail_url}" style="margin-right: 10px;" /></a>')
         
