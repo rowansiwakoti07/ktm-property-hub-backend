@@ -2,9 +2,7 @@ from django.contrib import admin
 from django import forms
 from .models import PropertyListing, Facility, PropertyImage
 from multiupload.fields import MultiMediaField
-from django.utils.text import slugify
 from django.utils.html import format_html
-import time
 
 @admin.register(Facility)
 class FacilityAdmin(admin.ModelAdmin):
@@ -12,12 +10,11 @@ class FacilityAdmin(admin.ModelAdmin):
     search_fields = ('name',)
 
 class PropertyListingAdminForm(forms.ModelForm):
-    # This field renders the multi-upload widget.
+    # This field just renders the widget.
     upload_new_images = MultiMediaField(
         min_num=0, max_num=20, max_file_size=1024*1024*8,
         required=False, help_text='Select and upload multiple new images for this property.'
     )
-
     class Meta:
         model = PropertyListing
         fields = '__all__'
@@ -35,44 +32,27 @@ class PropertyListingAdmin(admin.ModelAdmin):
         # First, save the main PropertyListing object to ensure it has an ID.
         super().save_model(request, obj, form, change)
     
-        # Get the list of uploaded files directly from the request.
+        # Get the files directly from the request.
         files = request.FILES.getlist('upload_new_images')
 
         if files:
-            prop_title_slug = slugify(obj.title)
-            folder_path = f"property_images/{obj.id}-{prop_title_slug}/"
-
             for image_file in files:
-                # --- THIS IS THE DEFINITIVE FIX ---
-                # 1. Create an unsaved instance of the PropertyImage model.
-                new_image_instance = PropertyImage(
+                # The logic is now extremely simple: just create the object.
+                # The 'upload_to' function in the model will handle the rest.
+                PropertyImage.objects.create(
                     property_listing=obj,
-                    image=image_file  # Assign the file object directly
+                    image=image_file
                 )
 
-                # 2. Construct the desired, unique public_id for Cloudinary.
-                original_filename = image_file.name.split('.')[0]
-                timestamp = int(time.time())
-                public_id = f"{folder_path}/{original_filename}-{timestamp}"
-
-                # 3. Manually set the public_id on the CloudinaryField BEFORE saving.
-                #    This tells the CloudinaryField "When you upload, use this path".
-                new_image_instance.image.public_id = public_id
-
-                # 4. Now, save the instance. The CloudinaryField will automatically
-                #    upload the file to the custom path we just defined.
-                new_image_instance.save()
-
-
+    # --- UX Refinements (Remain the same and will now work correctly) ---
     def get_existing_images_preview(self, obj):
         if not obj.pk:
             return "(No images yet)"
         
         previews = []
+        import cloudinary
         for img in obj.images.all():
             if img.image and hasattr(img.image, 'url'):
-                # We must import cloudinary here as it's not a top-level dependency
-                import cloudinary
                 thumbnail_url = cloudinary.CloudinaryImage(img.image.public_id).build_url(height=100, width=100, crop="fill")
                 previews.append(f'<a href="{img.image.url}" target="_blank"><img src="{thumbnail_url}" style="margin-right: 10px;" /></a>')
         
