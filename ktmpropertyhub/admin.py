@@ -2,7 +2,10 @@ from django.contrib import admin
 from django import forms
 from .models import PropertyListing, Facility, PropertyImage
 from multiupload.fields import MultiMediaField
+from django.utils.text import slugify
 from django.utils.html import format_html
+import cloudinary.uploader
+import time
 
 @admin.register(Facility)
 class FacilityAdmin(admin.ModelAdmin):
@@ -32,16 +35,32 @@ class PropertyListingAdmin(admin.ModelAdmin):
         # First, save the main PropertyListing object to ensure it has an ID.
         super().save_model(request, obj, form, change)
     
-        # Get the files directly from the request.
+        # Get the files directly from the request to bypass validation errors.
         files = request.FILES.getlist('upload_new_images')
 
         if files:
+            prop_title_slug = slugify(obj.title)
+            folder_path = f"property_images/{obj.id}-{prop_title_slug}"
+
             for image_file in files:
-                # The logic is now extremely simple: just create the object.
-                # The 'upload_to' function in the model will handle the rest.
+                original_filename = image_file.name.split('.')[0]
+                timestamp = int(time.time())
+                public_id = f"{folder_path}/{original_filename}-{timestamp}"
+                
+                # --- THIS IS THE CRITICAL LOGIC ---
+                # 1. Manually upload the file to Cloudinary with our custom public_id.
+                upload_result = cloudinary.uploader.upload(
+                    image_file,
+                    public_id=public_id,
+                    overwrite=True,
+                    resource_type="image"
+                )
+                
+                # 2. Create the PropertyImage record in our database.
+                #    We save the secure URL that Cloudinary returns from the upload.
                 PropertyImage.objects.create(
                     property_listing=obj,
-                    image=image_file
+                    image=upload_result['secure_url']
                 )
 
     # --- UX Refinements (Remain the same and will now work correctly) ---
@@ -52,7 +71,7 @@ class PropertyListingAdmin(admin.ModelAdmin):
         previews = []
         for img in obj.images.all():
             if img.image and hasattr(img.image, 'url'):
-                import cloudinary
+                # We can build a thumbnail from the URL
                 thumbnail_url = cloudinary.CloudinaryImage(img.image.public_id).build_url(height=100, width=100, crop="fill")
                 previews.append(f'<a href="{img.image.url}" target="_blank"><img src="{thumbnail_url}" style="margin-right: 10px;" /></a>')
         
