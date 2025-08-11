@@ -40,7 +40,7 @@ class PropertyListingAdminForm(forms.ModelForm):
 @admin.register(PropertyListing)
 class PropertyListingAdmin(admin.ModelAdmin):
     form = PropertyListingAdminForm
-    list_display = ('title', 'listing_purpose', 'property_type', 'user', 'is_active', 'image_count')
+    list_display = ('title', 'listing_purpose', 'property_type', 'user', 'is_active')
     list_filter = ('listing_purpose', 'property_type', 'is_active', 'state', 'district')
     search_fields = ('title', 'local_area', 'user__username')
     list_per_page = 25
