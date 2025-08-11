@@ -186,27 +186,6 @@ class PropertyListing(models.Model):
 # NEW MODEL FOR HANDLING PROPERTY IMAGES
 # ==============================================================================
 
-# --- THIS IS THE DYNAMIC PATH FUNCTION ---
-def get_property_image_path(instance, filename):
-    """
-    A function to dynamically determine the upload path for a property image.
-    This is the Django-standard way to handle dynamic upload paths.
-    """
-    # instance is the PropertyImage object being saved.
-    property_listing = instance.property_listing
-    
-    # Construct the folder path
-    prop_title_slug = slugify(property_listing.title)
-    folder = f"property_images/{property_listing.id}-{prop_title_slug}"
-    
-    # Construct the unique filename
-    original_filename = filename.split('.')[0]
-    timestamp = int(time.time())
-    unique_filename = f"{original_filename}-{timestamp}.{filename.split('.')[-1]}"
-    
-    # Return the full path for Cloudinary
-    return f"{folder}/{unique_filename}"
-
 class PropertyImage(models.Model):
     """
     A model to store images associated with a single property listing.
@@ -218,6 +197,27 @@ class PropertyImage(models.Model):
         related_name='images',
         help_text="The property this image belongs to."
     )
+
+    # --- THIS IS THE DYNAMIC PATH FUNCTION ---
+    def get_property_image_path(instance, filename):
+        """
+        A function to dynamically determine the upload path for a property image.
+        This is the Django-standard way to handle dynamic upload paths.
+        """
+        # instance is the PropertyImage object being saved.
+        property_listing = instance.property_listing
+        
+        # Construct the folder path
+        prop_title_slug = slugify(property_listing.title)
+        folder = f"property_images/{property_listing.id}-{prop_title_slug}"
+        
+        # Construct the unique filename
+        original_filename = filename.split('.')[0]
+        timestamp = int(time.time())
+        unique_filename = f"{original_filename}-{timestamp}.{filename.split('.')[-1]}"
+        
+        # Return the full path for Cloudinary
+        return f"{folder}/{unique_filename}"
     
     # This is the magic field from the cloudinary-django library.
     # It will handle uploading to Cloudinary and store the image URL.
