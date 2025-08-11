@@ -54,8 +54,8 @@ class PropertyListing(models.Model):
 
     # --- Price ---
     # For 'Sell'/'Rent', we can use just 'price_max'. For 'Buy', use both.
-    price_min = models.DecimalField(max_digits=14, decimal_places=2, blank=True, null=True, help_text="Minimum price for a 'Buy' listing.")
-    price_max = models.DecimalField(max_digits=14, decimal_places=2, blank=True, null=True, help_text="Maximum or single asking price.")
+    price = models.DecimalField(max_digits=14, decimal_places=2, blank=True, null=True, help_text="For 'Buy' listings only.")
+    price_max = models.DecimalField(max_digits=14, decimal_places=2, blank=True, null=True)
     
     class PriceNegotiability(models.TextChoices):
         FIXED = 'FIXED', 'Fixed'
@@ -73,8 +73,8 @@ class PropertyListing(models.Model):
     land_size_2_unit = models.CharField(max_length=20, blank=True, null=True)
 
     # --- Road Information ---
-    road_size_min_ft = models.PositiveIntegerField(blank=True, null=True, help_text="For 'Buy' listings or exact size.")
-    road_size_max_ft = models.PositiveIntegerField(blank=True, null=True, help_text="For 'Buy' listings.")
+    road_size_min_ft = models.PositiveIntegerField(blank=True, null=True, help_text="For 'Buy' listings only.")
+    road_size_ft = models.PositiveIntegerField(blank=True, null=True)
     
     class RoadCondition(models.TextChoices):
         ANY = 'ANY', 'Any'
@@ -120,20 +120,20 @@ class PropertyListing(models.Model):
     built_year_bs = models.PositiveIntegerField(blank=True, null=True, help_text="Year of construction in Bikram Sambat.")
     built_year_ad = models.PositiveIntegerField(blank=True, null=True, help_text="Year of construction in AD.")
     
-    floors_min = models.PositiveIntegerField(blank=True, null=True)
-    floors_max = models.PositiveIntegerField(blank=True, null=True)
+    floors_min = models.PositiveIntegerField(blank=True, null=True, help_text="For 'Buy' listings only.")
+    floors = models.PositiveIntegerField(blank=True, null=True)
 
     # Room Details (using min/max for 'Buy' requests)
-    master_bedrooms_min = models.PositiveIntegerField(blank=True, null=True)
-    master_bedrooms_max = models.PositiveIntegerField(blank=True, null=True)
-    common_bedrooms_min = models.PositiveIntegerField(blank=True, null=True)
-    common_bedrooms_max = models.PositiveIntegerField(blank=True, null=True)
-    common_bathrooms_min = models.PositiveIntegerField(blank=True, null=True)
-    common_bathrooms_max = models.PositiveIntegerField(blank=True, null=True)
-    living_rooms_min = models.PositiveIntegerField(blank=True, null=True)
-    living_rooms_max = models.PositiveIntegerField(blank=True, null=True)
-    kitchens_min = models.PositiveIntegerField(blank=True, null=True)
-    kitchens_max = models.PositiveIntegerField(blank=True, null=True)
+    master_bedrooms_min = models.PositiveIntegerField(blank=True, null=True, help_text="For 'Buy' listings only.")
+    master_bedrooms = models.PositiveIntegerField(blank=True, null=True)
+    common_bedrooms_min = models.PositiveIntegerField(blank=True, null=True, help_text="For 'Buy' listings only.")
+    common_bedrooms = models.PositiveIntegerField(blank=True, null=True)
+    common_bathrooms_min = models.PositiveIntegerField(blank=True, null=True, help_text="For 'Buy' listings only.")
+    common_bathrooms = models.PositiveIntegerField(blank=True, null=True)
+    living_rooms_min = models.PositiveIntegerField(blank=True, null=True, help_text="For 'Buy' listings only.")
+    living_rooms = models.PositiveIntegerField(blank=True, null=True)
+    kitchens_min = models.PositiveIntegerField(blank=True, null=True, help_text="For 'Buy' listings only.")
+    kitchens = models.PositiveIntegerField(blank=True, null=True)
     
     has_laundry = models.BooleanField(default=False)
     has_store = models.BooleanField(default=False)
@@ -146,10 +146,10 @@ class PropertyListing(models.Model):
 
     furnishing = models.CharField(max_length=10, choices=Furnishing.choices, blank=True, null=True)
     
-    parking_car_min = models.PositiveIntegerField(blank=True, null=True)
-    parking_car_max = models.PositiveIntegerField(blank=True, null=True)
-    parking_bike_min = models.PositiveIntegerField(blank=True, null=True)
-    parking_bike_max = models.PositiveIntegerField(blank=True, null=True)
+    parking_car_min = models.PositiveIntegerField(blank=True, null=True, help_text="For 'Buy' listings only.")
+    parking_car = models.PositiveIntegerField(blank=True, null=True)
+    parking_bike_min = models.PositiveIntegerField(blank=True, null=True, help_text="For 'Buy' listings only.")
+    parking_bike = models.PositiveIntegerField(blank=True, null=True)
     
     # --- Rental Specific Fields ---
     rent_duration_value = models.PositiveIntegerField(blank=True, null=True)

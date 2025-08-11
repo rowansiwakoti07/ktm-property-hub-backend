@@ -30,7 +30,8 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'www.ktmpropertyhub.com',
     '.vercel.app',
-    '.now.sh'
+    '.now.sh',
+    '127.0.0.1'
 ]
 
 # --- CORS HEADERS CONFIGURATION ---
