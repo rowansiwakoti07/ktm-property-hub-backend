@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'ktmpropertyhub',
     'rest_framework',
     'django_filters',
+    'multiupload'
 ]
 
 MIDDLEWARE = [
