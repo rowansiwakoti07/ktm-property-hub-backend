@@ -59,7 +59,7 @@ class PropertyListingAdmin(admin.ModelAdmin):
 
             for image_file in files:
                 if hasattr(image_file, 'name'):  # Check if image_file has a 'name' attribute
-                    original_filename = image_file.name.split('.')[0]
+                    original_filename = 'image_file.name.split('')[0]'
                     timestamp = int(time.time())
                     public_id = f"{folder_path}/{original_filename}-{timestamp}"
                     
