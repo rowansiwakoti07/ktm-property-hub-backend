@@ -4,6 +4,7 @@ from .models import PropertyListing, Facility, PropertyImage
 from multiupload.fields import MultiImageField
 from django.utils.text import slugify
 from django.utils.html import format_html
+from django.core.exceptions import ValidationError
 import cloudinary.uploader
 import time
 
@@ -22,6 +23,19 @@ class PropertyListingAdminForm(forms.ModelForm):
     class Meta:
         model = PropertyListing
         fields = '__all__'
+
+    def clean_upload_new_images(self):
+        # This will handle the file validation manually
+        files = self.cleaned_data.get('upload_new_images', [])
+        if not files:
+            return files
+
+        # Check each file
+        for file in files:
+            if not file.name.endswith(('jpg', 'jpeg', 'png')):
+                raise ValidationError('Only JPG, JPEG, and PNG files are allowed.')
+
+        return files
 
 @admin.register(PropertyListing)
 class PropertyListingAdmin(admin.ModelAdmin):
