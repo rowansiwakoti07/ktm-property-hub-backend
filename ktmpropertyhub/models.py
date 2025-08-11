@@ -3,6 +3,7 @@
 from django.db import models
 from django.conf import settings # To link to the User model
 from cloudinary.models import CloudinaryField
+from django.utils.text import slugify
 
 class Facility(models.Model):
     """
@@ -199,7 +200,6 @@ class PropertyImage(models.Model):
     # It will handle uploading to Cloudinary and store the image URL.
     image = CloudinaryField(
         'image',
-        folder='property_images', # Optional: Organizes images in a Cloudinary folder
         overwrite=True,
         resource_type='image'
     )
@@ -218,3 +218,18 @@ class PropertyImage(models.Model):
 
     def __str__(self):
         return f"Image for property: {self.property_listing.title}"
+    
+    def save(self, *args, **kwargs):
+        # This is the magic. We run this before the model is saved.
+        if self.image and not self.image.public_id:
+            # Create a URL-safe slug from the property title
+            prop_title_slug = slugify(self.property_listing.title)
+            
+            # Get the original filename from the uploaded file
+            original_filename = self.image.name.split('/')[-1].split('.')[0]
+            
+            # Construct the dynamic public_id (folder_path/filename)
+            # Example: property_images/10-modern-3bhk-house/front-view
+            self.image.public_id = f"property_images/{self.property_listing.id}-{prop_title_slug}/{original_filename}"
+            
+        super().save(*args, **kwargs)
