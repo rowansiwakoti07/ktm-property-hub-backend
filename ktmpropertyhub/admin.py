@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django import forms
 from .models import PropertyListing, Facility, PropertyImage
-from multiupload.fields import MultiImageField
+from multiupload.fields import MultiMediaField
 from django.utils.text import slugify
 from django.utils.html import format_html
 from django.core.exceptions import ValidationError
@@ -15,7 +15,7 @@ class FacilityAdmin(admin.ModelAdmin):
 
 class PropertyListingAdminForm(forms.ModelForm):
     # This field renders the widget. We give it a unique name.
-    upload_new_images = MultiImageField(
+    upload_new_images = MultiMediaField(
         min_num=0, max_num=20, max_file_size=1024*1024*8,
         required=False, help_text='Select and upload multiple new images for this property.'
     )
