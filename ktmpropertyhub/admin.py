@@ -46,39 +46,39 @@ class PropertyListingAdmin(admin.ModelAdmin):
     list_per_page = 25
     readonly_fields = ('get_existing_images_preview',)
     
-    def save_model(self, request, obj, form, change):
-        super().save_model(request, obj, form, change)
+    # def save_model(self, request, obj, form, change):
+    #     super().save_model(request, obj, form, change)
     
-        files = request.FILES.getlist('upload_new_images[]')
+    #     files = request.FILES.getlist('upload_new_images[]')
 
-        print(f"Uploaded files: {files}")
-        print(isinstance(files, list))
-        if files:
-            prop_title_slug = slugify(obj.title)
-            folder_path = f"property_images/{obj.id}-{prop_title_slug}"
+    #     print(f"Uploaded files: {files}")
+    #     print(isinstance(files, list))
+    #     if files:
+    #         prop_title_slug = slugify(obj.title)
+    #         folder_path = f"property_images/{obj.id}-{prop_title_slug}"
 
-            for image_file in files:
-                if hasattr(image_file, 'name'):  # Check if image_file has a 'name' attribute
-                    original_filename = image_file.name.split('.')[0]
-                    timestamp = int(time.time())
-                    public_id = f"{folder_path}/{original_filename}-{timestamp}"
+    #         for image_file in files:
+    #             if hasattr(image_file, 'name'):  # Check if image_file has a 'name' attribute
+    #                 original_filename = image_file.name.split('.')[0]
+    #                 timestamp = int(time.time())
+    #                 public_id = f"{folder_path}/{original_filename}-{timestamp}"
                     
-                    # Manually upload the file to Cloudinary
-                    cloudinary.uploader.upload(
-                        image_file,
-                        public_id=public_id,
-                        overwrite=True,
-                        resource_type="image"
-                    )
+    #                 # Manually upload the file to Cloudinary
+    #                 cloudinary.uploader.upload(
+    #                     image_file,
+    #                     public_id=public_id,
+    #                     overwrite=True,
+    #                     resource_type="image"
+    #                 )
                     
-                    # Create the PropertyImage record
-                    PropertyImage.objects.create(
-                        property_listing=obj,
-                        image=public_id
-                    )
-                else:
-                    # Log or handle cases where the file doesn't have a 'name' attribute
-                    print(f"Invalid file object: {image_file}")
+    #                 # Create the PropertyImage record
+    #                 PropertyImage.objects.create(
+    #                     property_listing=obj,
+    #                     image=public_id
+    #                 )
+    #             else:
+    #                 # Log or handle cases where the file doesn't have a 'name' attribute
+    #                 print(f"Invalid file object: {image_file}")
 
 
     def get_existing_images_preview(self, obj):
