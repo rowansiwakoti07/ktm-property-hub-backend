@@ -24,18 +24,18 @@ class PropertyListingAdminForm(forms.ModelForm):
         model = PropertyListing
         fields = '__all__'
 
-    def clean_upload_new_images(self):
-        # This will handle the file validation manually
-        files = self.cleaned_data.get('upload_new_images', [])
-        if not files:
-            return files
+    # def clean_upload_new_images(self):
+    #     # This will handle the file validation manually
+    #     files = self.cleaned_data.get('upload_new_images', [])
+    #     if not files:
+    #         return files
 
-        # Check each file
-        for file in files:
-            if not file.name.endswith(('jpg', 'jpeg', 'png')):
-                raise ValidationError('Only JPG, JPEG, and PNG files are allowed.')
+    #     # Check each file
+    #     for file in files:
+    #         if not file.name.endswith(('jpg', 'jpeg', 'png')):
+    #             raise ValidationError('Only JPG, JPEG, and PNG files are allowed.')
 
-        return files
+    #     return files
 
 @admin.register(PropertyListing)
 class PropertyListingAdmin(admin.ModelAdmin):
@@ -49,7 +49,7 @@ class PropertyListingAdmin(admin.ModelAdmin):
     # def save_model(self, request, obj, form, change):
     #     super().save_model(request, obj, form, change)
     
-    #     files = request.FILES.getlist('upload_new_images[]')
+    #     files = request.FILES.getlist('upload_new_images')
 
     #     print(f"Uploaded files: {files}")
     #     print(isinstance(files, list))
