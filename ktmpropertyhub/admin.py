@@ -37,24 +37,26 @@ class PropertyListingAdmin(admin.ModelAdmin):
 
         if files:
             prop_title_slug = slugify(obj.title)
-            folder_path = f"Home/property_images/{obj.id}-{prop_title_slug}"
+            # 1. Define the target folder path cleanly.
+            folder_path = f"property_images/{obj.id}-{prop_title_slug}"
 
             for image_file in files:
+                # 2. Define the desired filename (without extension).
                 original_filename = image_file.name.split('.')[0]
                 timestamp = int(time.time())
-                public_id = f"{folder_path}/{original_filename}-{timestamp}"
+                file_name = f"{original_filename}-{timestamp}"
                 
+                # 3. Call the uploader with the explicit 'folder' and 'public_id' parameters.
                 upload_result = cloudinary.uploader.upload(
                     image_file,
-                    public_id=public_id,
+                    folder=folder_path,
+                    public_id=file_name,
                     overwrite=True,
                     resource_type="image"
                 )
                 
-                # --- THIS IS THE DEFINITIVE FIX ---
-                # We save the 'public_id' from the result, NOT the 'secure_url'.
-                # The CloudinaryField will store this reference and can generate
-                # the full URL from it whenever needed.
+                # 4. Save the full public_id (folder/filename) that Cloudinary returns.
+                #    This remains the correct approach.
                 PropertyImage.objects.create(
                     property_listing=obj,
                     image=upload_result['public_id'] 
