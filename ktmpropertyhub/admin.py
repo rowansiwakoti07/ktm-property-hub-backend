@@ -4,8 +4,6 @@ from .models import PropertyListing, Facility, PropertyImage
 from multiupload.fields import MultiMediaField
 from django.utils.text import slugify
 from django.utils.html import format_html
-from django.core.exceptions import ValidationError
-import cloudinary.uploader
 import time
 
 @admin.register(Facility)
@@ -14,7 +12,7 @@ class FacilityAdmin(admin.ModelAdmin):
     search_fields = ('name',)
 
 class PropertyListingAdminForm(forms.ModelForm):
-    # This field renders the widget. We give it a unique name.
+    # This field renders the multi-upload widget.
     upload_new_images = MultiMediaField(
         min_num=0, max_num=20, max_file_size=1024*1024*8,
         required=False, help_text='Select and upload multiple new images for this property.'
@@ -23,19 +21,6 @@ class PropertyListingAdminForm(forms.ModelForm):
     class Meta:
         model = PropertyListing
         fields = '__all__'
-
-    # def clean_upload_new_images(self):
-    #     # This will handle the file validation manually
-    #     files = self.cleaned_data.get('upload_new_images', [])
-    #     if not files:
-    #         return files
-
-    #     # Check each file
-    #     for file in files:
-    #         if not file.name.endswith(('jpg', 'jpeg', 'png')):
-    #             raise ValidationError('Only JPG, JPEG, and PNG files are allowed.')
-
-    #     return files
 
 @admin.register(PropertyListing)
 class PropertyListingAdmin(admin.ModelAdmin):
@@ -47,52 +32,48 @@ class PropertyListingAdmin(admin.ModelAdmin):
     readonly_fields = ('get_existing_images_preview',)
     
     def save_model(self, request, obj, form, change):
+        # First, save the main PropertyListing object to ensure it has an ID.
         super().save_model(request, obj, form, change)
     
+        # Get the list of uploaded files directly from the request.
         files = request.FILES.getlist('upload_new_images')
 
-        print(f"Uploaded files: {files}")
-        print(isinstance(files, list))
         if files:
             prop_title_slug = slugify(obj.title)
             folder_path = f"property_images/{obj.id}-{prop_title_slug}"
 
             for image_file in files:
-                if hasattr(image_file, 'name'):  # Check if image_file has a 'name' attribute
-                    original_filename = image_file.name.split('.')[0]
-                    timestamp = int(time.time())
-                    public_id = f"{folder_path}/{original_filename}-{timestamp}"
-                    
-                    # Manually upload the file to Cloudinary
-                    cloudinary.uploader.upload(
-                        image_file,
-                        public_id=public_id,
-                        overwrite=True,
-                        resource_type="image"
-                    )
-                    
-                    # Create the PropertyImage record
-                    PropertyImage.objects.create(
-                        property_listing=obj,
-                        image=public_id
-                    )
-                else:
-                    # Log or handle cases where the file doesn't have a 'name' attribute
-                    print(f"Invalid file object: {image_file}")
+                # --- THIS IS THE DEFINITIVE FIX ---
+                # 1. Create an unsaved instance of the PropertyImage model.
+                new_image_instance = PropertyImage(
+                    property_listing=obj,
+                    image=image_file  # Assign the file object directly
+                )
+
+                # 2. Construct the desired, unique public_id for Cloudinary.
+                original_filename = image_file.name.split('.')[0]
+                timestamp = int(time.time())
+                public_id = f"{folder_path}/{original_filename}-{timestamp}"
+
+                # 3. Manually set the public_id on the CloudinaryField BEFORE saving.
+                #    This tells the CloudinaryField "When you upload, use this path".
+                new_image_instance.image.public_id = public_id
+
+                # 4. Now, save the instance. The CloudinaryField will automatically
+                #    upload the file to the custom path we just defined.
+                new_image_instance.save()
 
 
     def get_existing_images_preview(self, obj):
-        # FIX FOR PREVIEWS: We now iterate through the existing images correctly.
         if not obj.pk:
             return "(No images yet)"
         
         previews = []
-        # obj.images.all() correctly uses the related_name from the model
         for img in obj.images.all():
-            # The 'image' attribute on the model instance is a CloudinaryResource object.
-            # We can build a thumbnail URL directly from it.
-            if img.image:
-                thumbnail_url = img.image.build_url(height=100, width=100, crop="fill")
+            if img.image and hasattr(img.image, 'url'):
+                # We must import cloudinary here as it's not a top-level dependency
+                import cloudinary
+                thumbnail_url = cloudinary.CloudinaryImage(img.image.public_id).build_url(height=100, width=100, crop="fill")
                 previews.append(f'<a href="{img.image.url}" target="_blank"><img src="{thumbnail_url}" style="margin-right: 10px;" /></a>')
         
         return format_html(''.join(previews)) if previews else "(No images yet)"
