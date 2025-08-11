@@ -31,40 +31,38 @@ class PropertyListingAdmin(admin.ModelAdmin):
     search_fields = ('title', 'local_area', 'user__username')
     list_per_page = 25
     readonly_fields = ('get_existing_images_preview',)
-
+    
     def save_model(self, request, obj, form, change):
-        # First, save the main PropertyListing object to ensure it has an ID.
         super().save_model(request, obj, form, change)
-
-        # --- THE DEFINITIVE FIX ---
-        # We DO NOT use form.cleaned_data.
-        # We get the list of files directly from the raw request.
-        # This bypasses the validation that was causing the crash.
+    
         files = request.FILES.getlist('upload_new_images')
-        
         if files:
             prop_title_slug = slugify(obj.title)
             folder_path = f"property_images/{obj.id}-{prop_title_slug}"
 
             for image_file in files:
-                original_filename = image_file.name.split('.')[0]
-                timestamp = int(time.time())
-                public_id = f"{folder_path}/{original_filename}-{timestamp}"
-                
-                # Manually upload the file to Cloudinary
-                cloudinary.uploader.upload(
-                    image_file,
-                    public_id=public_id,
-                    overwrite=True,
-                    resource_type="image"
-                )
-                
-                # Create the PropertyImage record. We store the public_id in the 'image' field.
-                # The CloudinaryField knows how to handle this.
-                PropertyImage.objects.create(
-                    property_listing=obj,
-                    image=public_id
-                )
+                if hasattr(image_file, 'name'):  # Check if image_file has a 'name' attribute
+                    original_filename = image_file.name.split('.')[0]
+                    timestamp = int(time.time())
+                    public_id = f"{folder_path}/{original_filename}-{timestamp}"
+                    
+                    # Manually upload the file to Cloudinary
+                    cloudinary.uploader.upload(
+                        image_file,
+                        public_id=public_id,
+                        overwrite=True,
+                        resource_type="image"
+                    )
+                    
+                    # Create the PropertyImage record
+                    PropertyImage.objects.create(
+                        property_listing=obj,
+                        image=public_id
+                    )
+                else:
+                    # Log or handle cases where the file doesn't have a 'name' attribute
+                    print(f"Invalid file object: {image_file}")
+
 
     def get_existing_images_preview(self, obj):
         # FIX FOR PREVIEWS: We now iterate through the existing images correctly.
