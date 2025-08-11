@@ -55,8 +55,8 @@ class PropertyListing(models.Model):
 
     # --- Price ---
     # For 'Sell'/'Rent', we can use just 'price_max'. For 'Buy', use both.
-    price = models.DecimalField(max_digits=14, decimal_places=2, blank=True, null=True, help_text="For 'Buy' listings only.")
-    price_max = models.DecimalField(max_digits=14, decimal_places=2, blank=True, null=True)
+    price_min = models.DecimalField(max_digits=14, decimal_places=2, blank=True, null=True, help_text="For 'Buy' listings only.")
+    price = models.DecimalField(max_digits=14, decimal_places=2, blank=True, null=True)
     
     class PriceNegotiability(models.TextChoices):
         FIXED = 'FIXED', 'Fixed'
