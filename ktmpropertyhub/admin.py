@@ -13,7 +13,6 @@ class FacilityAdmin(admin.ModelAdmin):
     search_fields = ('name',)
 
 class PropertyListingAdminForm(forms.ModelForm):
-    # This field just renders the widget.
     upload_new_images = MultiMediaField(
         min_num=0, max_num=20, max_file_size=1024*1024*8,
         required=False, help_text='Select and upload multiple new images for this property.'
@@ -32,10 +31,8 @@ class PropertyListingAdmin(admin.ModelAdmin):
     readonly_fields = ('get_existing_images_preview',)
     
     def save_model(self, request, obj, form, change):
-        # First, save the main PropertyListing object to ensure it has an ID.
         super().save_model(request, obj, form, change)
     
-        # Get the files directly from the request to bypass validation errors.
         files = request.FILES.getlist('upload_new_images')
 
         if files:
@@ -47,8 +44,6 @@ class PropertyListingAdmin(admin.ModelAdmin):
                 timestamp = int(time.time())
                 public_id = f"{folder_path}/{original_filename}-{timestamp}"
                 
-                # --- THIS IS THE CRITICAL LOGIC ---
-                # 1. Manually upload the file to Cloudinary with our custom public_id.
                 upload_result = cloudinary.uploader.upload(
                     image_file,
                     public_id=public_id,
@@ -56,22 +51,23 @@ class PropertyListingAdmin(admin.ModelAdmin):
                     resource_type="image"
                 )
                 
-                # 2. Create the PropertyImage record in our database.
-                #    We save the secure URL that Cloudinary returns from the upload.
+                # --- THIS IS THE DEFINITIVE FIX ---
+                # We save the 'public_id' from the result, NOT the 'secure_url'.
+                # The CloudinaryField will store this reference and can generate
+                # the full URL from it whenever needed.
                 PropertyImage.objects.create(
                     property_listing=obj,
-                    image=upload_result['secure_url']
+                    image=upload_result['public_id'] 
                 )
 
-    # --- UX Refinements (Remain the same and will now work correctly) ---
     def get_existing_images_preview(self, obj):
         if not obj.pk:
             return "(No images yet)"
         
         previews = []
+        import cloudinary
         for img in obj.images.all():
             if img.image and hasattr(img.image, 'url'):
-                # We can build a thumbnail from the URL
                 thumbnail_url = cloudinary.CloudinaryImage(img.image.public_id).build_url(height=100, width=100, crop="fill")
                 previews.append(f'<a href="{img.image.url}" target="_blank"><img src="{thumbnail_url}" style="margin-right: 10px;" /></a>')
         
