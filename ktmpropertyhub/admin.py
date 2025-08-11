@@ -37,7 +37,7 @@ class PropertyListingAdmin(admin.ModelAdmin):
 
         if files:
             prop_title_slug = slugify(obj.title)
-            folder_path = f"property_images/{obj.id}-{prop_title_slug}"
+            folder_path = f"Home/property_images/{obj.id}-{prop_title_slug}"
 
             for image_file in files:
                 original_filename = image_file.name.split('.')[0]
