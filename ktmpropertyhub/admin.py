@@ -56,7 +56,7 @@ class PropertyListingAdmin(admin.ModelAdmin):
                 )
                 
                 # 4. Save the full public_id (folder/filename) that Cloudinary returns.
-                #    This remains the correct approach.
+                # This remains the correct approach.
                 PropertyImage.objects.create(
                     property_listing=obj,
                     image=upload_result['public_id'] 

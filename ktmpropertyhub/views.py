@@ -1,9 +1,24 @@
-# ktmpropertyhub/views.py
-
 from rest_framework import viewsets
 from django_filters.rest_framework import DjangoFilterBackend
-from .models import PropertyListing
-from .serializers import PropertyListingSerializer
+from .models import PropertyListing, State, District
+from .serializers import PropertyListingSerializer, StateSerializer, DistrictSerializer
+
+class StateViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint that allows states to be viewed.
+    """
+    queryset = State.objects.all().order_by('name')
+    serializer_class = StateSerializer
+
+class DistrictViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint that allows districts to be viewed.
+    Can be filtered by state_id, e.g., /api/districts/?state=1
+    """
+    queryset = District.objects.all().order_by('name')
+    serializer_class = DistrictSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['state'] # Enable filtering by the 'state' foreign key
 
 class PropertyListingViewSet(viewsets.ReadOnlyModelViewSet):
     """

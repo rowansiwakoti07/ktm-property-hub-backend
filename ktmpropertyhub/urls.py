@@ -4,12 +4,14 @@
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import PropertyListingViewSet
+from .views import PropertyListingViewSet, StateViewSet, DistrictViewSet
 
 # --- API ROUTER CONFIGURATION ---
 # Create a router to automatically generate the API URLs.
 router = DefaultRouter()
 router.register(r'properties', PropertyListingViewSet, basename='propertylisting')
+router.register(r'states', StateViewSet, basename='state')
+router.register(r'districts', DistrictViewSet, basename='district')
 
 # --- MAIN URL PATTERNS ---
 # This is the master list of URL patterns for your project.

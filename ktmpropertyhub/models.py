@@ -4,6 +4,29 @@ from cloudinary.models import CloudinaryField
 from django.utils.text import slugify
 import time
 
+
+# ==============================================================================
+# NEW MODELS FOR STATE AND DISTRICT
+# ==============================================================================
+class State(models.Model):
+    """
+    Stores a state of Nepal (e.g., Bagmati, Gandaki).
+    """
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
+
+class District(models.Model):
+    """
+    Stores a district, linked to a specific state.
+    """
+    state = models.ForeignKey(State, on_delete=models.CASCADE, related_name='districts')
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.name}, {self.state.name}"
+
 class Facility(models.Model):
     """
     A model to store individual, admin-approved facilities. This populates
@@ -48,8 +71,19 @@ class PropertyListing(models.Model):
     is_active = models.BooleanField(default=True, help_text="Is the listing currently active and visible?")
     
     # --- Location (Common to All) ---
-    state = models.CharField(max_length=100, blank=True, null=True, help_text="State or Province")
-    district = models.CharField(max_length=100, blank=True, null=True)
+    state = models.ForeignKey(
+        State, 
+        on_delete=models.SET_NULL, # If a state is deleted, don't delete the property
+        null=True, 
+        blank=True,
+        help_text="State or Province"
+    )
+    district = models.ForeignKey(
+        District,
+        on_delete=models.SET_NULL, # If a district is deleted, don't delete the property
+        null=True,
+        blank=True
+    )
     local_area = models.CharField(max_length=255, blank=True, null=True, help_text="Specific local area, neighborhood, or municipality.")
 
     # --- Price ---

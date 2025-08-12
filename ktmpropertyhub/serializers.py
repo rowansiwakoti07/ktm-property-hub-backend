@@ -1,5 +1,15 @@
 from rest_framework import serializers
-from .models import PropertyListing, Facility, PropertyImage
+from .models import PropertyListing, Facility, PropertyImage, State, District
+
+class StateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = State
+        fields = ['id', 'name']
+
+class DistrictSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = District
+        fields = ['id', 'name']
 
 class FacilitySerializer(serializers.ModelSerializer):
     """
@@ -19,17 +29,16 @@ class PropertyImageSerializer(serializers.ModelSerializer):
         fields = ['id', 'image', 'caption', 'is_thumbnail']
 
 class PropertyListingSerializer(serializers.ModelSerializer):
-    """
-    The main serializer for the PropertyListing model. This will be used
-    for the list and detail views.
-    """
-    # To show the username instead of the user ID
     user = serializers.StringRelatedField(read_only=True)
-    
-    # Nest the serializers for related models to show their full data
     facilities = FacilitySerializer(many=True, read_only=True)
     images = PropertyImageSerializer(many=True, read_only=True)
 
+    state = StateSerializer(read_only=True)
+    district = DistrictSerializer(read_only=True)
+    
+    # We need to add fields to accept the ID when creating/updating
+    state_id = serializers.IntegerField(write_only=True)
+    district_id = serializers.IntegerField(write_only=True)
     class Meta:
         model = PropertyListing
         # We list all fields to be explicit about what our API exposes
@@ -47,5 +56,5 @@ class PropertyListingSerializer(serializers.ModelSerializer):
             'has_puja_room', 'furnishing', 'parking_car_min', 'parking_car',
             'parking_bike_min', 'parking_bike', 'rent_duration_value',
             'rent_duration_unit', 'rent_period', 'other_facilities',
-            'facilities', 'images' # Our nested relationships
+            'facilities', 'images', 'state', 'district', 'state_id', 'district_id'
         ]
