@@ -81,3 +81,8 @@ class PropertyListingAdmin(admin.ModelAdmin):
         return obj.images.count()
     
     image_count.short_description = 'Images'
+
+    # The Media class tells this admin page to load specific CSS or JS files.
+    class Media:
+        # The path is relative to your app's static directory
+        js = ('ktmpropertyhub/js/admin_filters.js',)
