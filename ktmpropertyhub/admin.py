@@ -87,5 +87,5 @@ class PropertyListingAdmin(admin.ModelAdmin):
         # The path is relative to your app's static directory
         js = (
             'ktmpropertyhub/js/admin_filters.js',         # For State/District dropdowns
-            'ktmpropertyhub/js/admin_conditional_fields.js' # For showing/hiding _min fields
+            'ktmpropertyhub/js/admin_dynamic_forms.js'    # For ALL conditional fields
         )
