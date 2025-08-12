@@ -85,4 +85,7 @@ class PropertyListingAdmin(admin.ModelAdmin):
     # The Media class tells this admin page to load specific CSS or JS files.
     class Media:
         # The path is relative to your app's static directory
-        js = ('ktmpropertyhub/js/admin_filters.js',)
+        js = (
+            'ktmpropertyhub/js/admin_filters.js',         # For State/District dropdowns
+            'ktmpropertyhub/js/admin_conditional_fields.js' # For showing/hiding _min fields
+        )
