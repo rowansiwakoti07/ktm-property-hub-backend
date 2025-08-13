@@ -42,7 +42,9 @@ class PropertyListingAdmin(admin.ModelAdmin):
         ('Price', {
             'fields': ('price_min', 'price', 'price_negotiable')
         }),
-        # We create a dedicated section for Land Size
+        ('Property Details', {
+            'fields': ('land_type', 'facing_direction', 'property_condition', 'built_year_bs', 'built_year_ad', 'floors_min', 'floors', 'master_bedrooms_min', 'master_bedrooms', 'common_bedrooms_min', 'common_bedrooms', 'common_bathrooms_min', 'common_bathrooms', 'living_rooms_min', 'living_rooms', 'kitchens_min', 'kitchens')
+        }),
         ('Land Size', {
             'description': 'Enter measurements for either Hilly or Terai area. Entering a value in one section will clear the other.',
             'fields': (
@@ -55,17 +57,14 @@ class PropertyListingAdmin(admin.ModelAdmin):
         ('Road Information', {
             'fields': ('road_size_min_ft', 'road_size_ft', 'road_condition')
         }),
-        ('Property Details', {
-            'fields': ('land_type', 'facing_direction', 'property_condition', 'built_year_bs', 'built_year_ad', 'floors_min', 'floors', 'master_bedrooms_min', 'master_bedrooms', 'common_bedrooms_min', 'common_bedrooms', 'common_bathrooms_min', 'common_bathrooms', 'living_rooms_min', 'living_rooms', 'kitchens_min', 'kitchens')
-        }),
-        ('Features & Facilities', {
-            'fields': ('has_laundry', 'has_store', 'has_puja_room', 'furnishing', 'facilities')
-        }),
         ('Parking', {
             'fields': ('parking_car_min', 'parking_car', 'parking_bike_min', 'parking_bike')
         }),
         ('Rental Details', {
             'fields': ('rent_duration_value', 'rent_duration_unit', 'rent_period')
+        }),
+        ('Features & Facilities', {
+            'fields': ('has_laundry', 'has_store', 'has_puja_room', 'furnishing', 'facilities')
         }),
         ('Image Upload', {
             'fields': ('upload_new_images', 'get_existing_images_preview')
