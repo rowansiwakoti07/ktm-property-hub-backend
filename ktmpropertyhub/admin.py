@@ -43,7 +43,7 @@ class PropertyListingAdmin(admin.ModelAdmin):
             'fields': ('price_min', 'price', 'price_negotiable')
         }),
         ('Property Details', {
-            'fields': ('land_type', 'facing_direction', 'property_condition', 'built_year_bs', 'built_year_ad', 'floors_min', 'floors', 'master_bedrooms_min', 'master_bedrooms', 'common_bedrooms_min', 'common_bedrooms', 'common_bathrooms_min', 'common_bathrooms', 'living_rooms_min', 'living_rooms', 'kitchens_min', 'kitchens')
+            'fields': ('land_type', 'facing_direction', 'property_condition', 'built_year_bs', 'built_year_ad', 'floors_min', 'floors', 'master_bedrooms_min', 'master_bedrooms', 'common_bedrooms_min', 'common_bedrooms', 'common_bathrooms_min', 'common_bathrooms', 'living_rooms_min', 'living_rooms', 'kitchens_min', 'kitchens', 'built_up_area_min', 'built_up_area')
         }),
         ('Land Size', {
             'description': 'Enter measurements for either Hilly or Terai area. Entering a value in one section will clear the other.',
