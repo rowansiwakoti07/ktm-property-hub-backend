@@ -4,11 +4,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const hillyInputs = document.querySelectorAll('.hilly-area-input');
     const teraiInputs = document.querySelectorAll('.terai-area-input');
 
-    // We add the selector for the output field
+    // We add the selector for the output field, which is guaranteed to be unique by its ID
     const totalSqftOutput = document.querySelector('#id_total_land_area_sqft');
 
+    // Safety check to ensure all necessary elements are on the page
     if (hillyInputs.length === 0 || teraiInputs.length === 0 || !totalSqftOutput) {
-        return; // Exit safely if any required elements are missing
+        return;
     }
 
     // --- 2. THE REAL-TIME CALCULATION LOGIC ---
@@ -20,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const calculateAndUpdateTotal = () => {
         let total = 0;
 
-        // We need the specific inputs for calculation, we can get them by their ID
+        // We need the specific inputs for calculation. We can safely get them by their ID.
         const ropani = document.querySelector('#id_size_ropani').value || 0;
         const aana = document.querySelector('#id_size_aana').value || 0;
         const paisa = document.querySelector('#id_size_paisa').value || 0;
@@ -30,6 +31,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const katha = document.querySelector('#id_size_katha').value || 0;
         const dhur = document.querySelector('#id_size_dhur').value || 0;
 
+        // Use your proven logic to determine which group is active
         const isHillyActive = Array.from(hillyInputs).some(input => input.value.trim() !== '');
 
         if (isHillyActive) {
@@ -46,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function () {
         totalSqftOutput.value = total.toFixed(2);
     };
 
-    // --- 3. YOUR PROVEN FIELD CLEARING LOGIC (with calculation added) ---
+    // --- 3. YOUR PROVEN FIELD CLEARING LOGIC (with the calculation call added) ---
     const clearInputs = (inputs) => {
         inputs.forEach(input => {
             input.value = '';
@@ -54,13 +56,28 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     hillyInputs.forEach(input => {
+        // We use the 'input' event for the best, real-time user experience.
         input.addEventListener('input', () => {
             const anyHillyValue = Array.from(hillyInputs).some(i => i.value.trim() !== '');
             if (anyHillyValue) {
                 clearInputs(teraiInputs);
             }
-            // Add the calculation call here
+            // CRITICAL: We call the calculation function immediately after clearing.
             calculateAndUpdateTotal();
         });
-    })
-})
+    });
+
+    teraiInputs.forEach(input => {
+        input.addEventListener('input', () => {
+            const anyTeraiValue = Array.from(teraiInputs).some(i => i.value.trim() !== '');
+            if (anyTeraiValue) {
+                clearInputs(hillyInputs);
+            }
+            // CRITICAL: We call the calculation function immediately after clearing.
+            calculateAndUpdateTotal();
+        });
+    });
+
+    // Run once on page load to set the correct initial total for edit pages
+    calculateAndUpdateTotal();
+});

@@ -28,7 +28,7 @@ class PropertyListingAdmin(admin.ModelAdmin):
     list_filter = ('listing_purpose', 'property_type', 'is_active', 'state', 'district')
     search_fields = ('title', 'local_area', 'user__username')
     list_per_page = 25
-    readonly_fields = ('get_existing_images_preview', 'total_land_area_sqft')
+    readonly_fields = ('get_existing_images_preview')
 
     # --- THIS IS THE CORE OF THE FUNCTIONAL UI SOLUTION ---
     # We use fieldsets to group the fields logically and provide clear headers.
@@ -89,7 +89,7 @@ class PropertyListingAdmin(admin.ModelAdmin):
         form.base_fields['size_bigha'].widget.attrs.update(terai_attrs)
         form.base_fields['size_katha'].widget.attrs.update(terai_attrs)
         form.base_fields['size_dhur'].widget.attrs.update(terai_attrs)
-        
+
         return form
     
     def save_model(self, request, obj, form, change):
