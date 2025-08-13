@@ -1,21 +1,36 @@
 // Wait for the DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function () {
-    // --- 1. CONFIGURATION ---
-    // All selectors are defined in one clear, easily updatable object.
+    // --- 1. CONFIGURATION (SEMANTICALLY CORRECT) ---
     const SELECTORS = {
         purpose: '#id_listing_purpose',
         propertyType: '#id_property_type',
-        buyOnly: [
+
+        // Fields that ONLY appear for 'BUY' (the "min" part of a range)
+        minRangeFields: [
             '.field-price_min', '.field-road_size_min_ft', '.field-floors_min',
-            '.field-master_bedrooms_min', '.field-common_bedrooms_min', 
-            '.field-common_bathrooms_min', '.field-living_rooms_min', 
+            '.field-master_bedrooms_min', '.field-common_bedrooms_min',
+            '.field-common_bathrooms_min', '.field-living_rooms_min',
             '.field-kitchens_min', '.field-parking_car_min', '.field-parking_bike_min'
         ],
-        rentOnly: [
+
+        // Fields that appear for BUY, SELL, or RENT (the "max" part of a range or a single value)
+        maxRangeOrSingleValueFields: [
+            '.field-price', '.field-road_size_ft', '.field-floors',
+            '.field-master_bedrooms', '.field-common_bedrooms',
+            '.field-common_bathrooms', '.field-living_rooms',
+            '.field-kitchens', '.field-parking_car', '.field-parking_bike'
+        ],
+
+        // Fields that ONLY appear for 'RENT'
+        rentOnlyFields: [
             '.field-rent_duration_value', '.field-rent_duration_unit', '.field-rent_period'
         ],
-        landOnly: ['.field-land_type'],
-        notForLand: [
+
+        // Fields that ONLY appear for 'LAND'
+        landOnlyFields: ['.field-land_type'],
+
+        // Fields that should NEVER appear for 'LAND'
+        notForLandFields: [
             '.field-property_condition', '.field-built_year_bs', '.field-built_year_ad',
             '.field-floors_min', '.field-floors', '.field-master_bedrooms_min',
             '.field-master_bedrooms', '.field-common_bedrooms_min', '.field-common_bedrooms',
@@ -31,51 +46,46 @@ document.addEventListener('DOMContentLoaded', function () {
     const propertyTypeSelect = document.querySelector(SELECTORS.propertyType);
 
     if (!purposeSelect || !propertyTypeSelect) {
-        return; // Exit safely if controls are not on the page
+        return;
     }
 
     // --- 2. THE STATE MACHINE LOGIC ---
-    // This is the heart of the solution. It is pure logic, with no DOM manipulation.
     const determineVisibility = () => {
         const purpose = purposeSelect.value;
         const type = propertyTypeSelect.value;
-        
-        // This object will hold the final visibility state for each selector.
         const visibilityMap = {};
 
-        // Helper function to apply a state to a group of selectors
         const setVisibility = (selectors, isVisible) => {
-            selectors.forEach(selector => {
-                visibilityMap[selector] = isVisible;
-            });
+            selectors.forEach(selector => { visibilityMap[selector] = isVisible; });
         };
 
-        // --- Rules Engine ---
-        // Rule 1: Determine visibility based on PURPOSE
-        setVisibility(SELECTORS.buyOnly, purpose === 'BUY');
+        // --- Rules Engine (Now Correctly Reflects Your Logic) ---
+
+        // Rule 1: The 'min' fields are ONLY visible for 'BUY'.
+        setVisibility(SELECTORS.minRangeFields, purpose === 'BUY');
+
+        // Rule 2: The 'max'/single-value fields are visible if ANY purpose is selected.
+        const anyPurposeSelected = purpose !== '';
+        setVisibility(SELECTORS.maxRangeOrSingleValueFields, anyPurposeSelected);
+
+        // Rule 3: The rent-specific fields are ONLY visible for 'RENT'.
         setVisibility(SELECTORS.rentOnly, purpose === 'RENT');
 
-        // Rule 2: Determine visibility based on TYPE
+        // Rule 4: The land-type field is ONLY visible for 'LAND'.
         setVisibility(SELECTORS.landOnly, type === 'LAND');
-        setVisibility(SELECTORS.notForLand, type !== 'LAND');
 
-        // Rule 3 (The Override): If type is LAND, it ALWAYS hides 'notForLand' fields,
-        // overriding any previous rule that might have shown them.
+        // Rule 5 (The Final Override): If type is LAND, it ALWAYS hides 'notForLand' fields.
+        // This is the most important rule and runs last to ensure it wins any conflict.
         if (type === 'LAND') {
             setVisibility(SELECTORS.notForLand, false);
         }
 
-        // Return the final, calculated state map.
         return visibilityMap;
     };
 
-    // --- 3. THE RENDERER ---
-    // This function's only job is to update the DOM based on the state map.
-    // It is completely separate from the logic.
+    // --- 3. THE RENDERER (No changes needed) ---
     const renderForm = () => {
         const visibilityMap = determineVisibility();
-        
-        // Iterate over the final map and apply the styles
         for (const selector in visibilityMap) {
             const fieldRow = document.querySelector(selector);
             if (fieldRow) {
@@ -84,12 +94,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
 
-    // --- 4. EVENT LISTENERS ---
-    // The event listeners are essential. We do NOT remove them.
-    // Their only job is to trigger a re-render.
+    // --- 4. EVENT LISTENERS (No changes needed) ---
     purposeSelect.addEventListener('change', renderForm);
     propertyTypeSelect.addEventListener('change', renderForm);
 
-    // Initial render on page load to set the correct state
+    // Initial render on page load
     renderForm();
 });
