@@ -62,4 +62,5 @@ document.addEventListener('DOMContentLoaded', function () {
             // Add the calculation call here
             calculateAndUpdateTotal();
         });
-    });
+    })
+})
