@@ -53,13 +53,13 @@ class PropertyListingAdmin(admin.ModelAdmin):
             )
         }),
         ('Road Information', {
-            'fields': ('road_size_min_ft', 'road_size_ft', 'road_condition', 'facing_direction')
+            'fields': ('road_size_min_ft', 'road_size_ft', 'road_condition')
         }),
-        ('Property & Room Details', {
-            'fields': ('land_type', 'property_condition', 'built_year_bs', 'built_year_ad', 'floors_min', 'floors', 'master_bedrooms_min', 'master_bedrooms', 'common_bedrooms_min', 'common_bedrooms', 'common_bathrooms_min', 'common_bathrooms', 'living_rooms_min', 'living_rooms', 'kitchens_min', 'kitchens')
+        ('Property Details', {
+            'fields': ('land_type', 'facing_direction', 'property_condition', 'built_year_bs', 'built_year_ad', 'floors_min', 'floors', 'master_bedrooms_min', 'master_bedrooms', 'common_bedrooms_min', 'common_bedrooms', 'common_bathrooms_min', 'common_bathrooms', 'living_rooms_min', 'living_rooms', 'kitchens_min', 'kitchens')
         }),
         ('Features & Facilities', {
-            'fields': ('has_laundry', 'has_store', 'has_puja_room', 'furnishing', 'facilities', 'other_facilities')
+            'fields': ('has_laundry', 'has_store', 'has_puja_room', 'furnishing', 'facilities')
         }),
         ('Parking', {
             'fields': ('parking_car_min', 'parking_car', 'parking_bike_min', 'parking_bike')

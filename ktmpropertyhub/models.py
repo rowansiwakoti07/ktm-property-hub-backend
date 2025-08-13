@@ -257,14 +257,6 @@ class PropertyListing(models.Model):
         help_text="Select the available facilities from the predefined list."
     )
 
-    # 2. FOR CUSTOM FACILITIES (The 'Other' Text Box)
-    other_facilities = models.TextField(
-        blank=True, 
-        null=True, 
-        help_text="Enter any additional facilities that are not in the list, separated by commas (e.g. Rooftop Garden, Servant Quarters)."
-    )
-
-
     def __str__(self):
         return f"{self.get_property_type_display()} for {self.get_listing_purpose_display()} - {self.title}"
 

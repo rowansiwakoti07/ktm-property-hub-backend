@@ -54,7 +54,7 @@ class PropertyListingSerializer(serializers.ModelSerializer):
             'kitchens_min', 'kitchens', 'has_laundry', 'has_store',
             'has_puja_room', 'furnishing', 'parking_car_min', 'parking_car',
             'parking_bike_min', 'parking_bike', 'rent_duration_value',
-            'rent_duration_unit', 'rent_period', 'other_facilities',
+            'rent_duration_unit', 'rent_period',
             'facilities', 'images', 'state', 'district', 'state_id', 'district_id',
              # --- THE NEW LAND SIZE FIELDS FOR THE API ---
             'ropani', 'aana', 'paisa', 'dam',
