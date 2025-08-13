@@ -115,51 +115,54 @@ class PropertyListing(models.Model):
     def save(self, *args, **kwargs):
         """
         Override the save method to automatically calculate the total square feet.
+        This is the ultimate source of truth for the calculation.
         """
-        # Conversion factors (as integers or floats for precision)
+        # Precise conversion factors
         ROPANI_SQFT = 5476
-        AANA_SQFT = 342.25  # 1 Ropani / 16
-        PAISA_SQFT = 85.56  # 1 Aana / 4
-        DAM_SQFT = 21.39    # 1 Paisa / 4
+        AANA_SQFT = 342.25
+        PAISA_SQFT = 85.56
+        DAM_SQFT = 21.39
 
         BIGHA_SQFT = 72900
-        KATHA_SQFT = 3645   # 1 Bigha / 20
-        DHUR_SQFT = 182.25  # 1 Katha / 20
+        KATHA_SQFT = 3645
+        DHUR_SQFT = 182.25
 
         total_sqft = 0
-
-        # We ensure that if a field is None, we treat it as 0 for the calculation.
-        hilly_values = [self.size_ropani, self.size_aana, self.size_paisa, self.size_dam]
-        terai_values = [self.size_bigha, self.size_katha, self.size_dhur]
+        
+        # Get the values, defaulting None to 0 for checks
+        hilly_values = [self.size_ropani or 0, self.size_aana or 0, self.size_paisa or 0, self.size_dam or 0]
+        terai_values = [self.size_bigha or 0, self.size_katha or 0, self.size_dhur or 0]
 
         # Check if any Hilly value has been entered by the user.
-        if any(v is not None for v in hilly_values):
+        # The sum() is a robust way to see if there's any input.
+        if sum(hilly_values) > 0:
             total_sqft = (
-                (self.size_ropani or 0) * ROPANI_SQFT +
-                (self.size_aana or 0) * AANA_SQFT +
-                (self.size_paisa or 0) * PAISA_SQFT +
-                (self.size_dam or 0) * DAM_SQFT
+                hilly_values[0] * ROPANI_SQFT +
+                hilly_values[1] * AANA_SQFT +
+                hilly_values[2] * PAISA_SQFT +
+                hilly_values[3] * DAM_SQFT
             )
-            # Clear Terai fields if Hilly fields are being used
+            # Ensure data integrity by clearing the other fields
             self.size_bigha = None
             self.size_katha = None
             self.size_dhur = None
         # Check if any Terai value has been entered.
-        elif any(v is not None for v in terai_values):
+        elif sum(terai_values) > 0:
             total_sqft = (
-                (self.size_bigha or 0) * BIGHA_SQFT +
-                (self.size_katha or 0) * KATHA_SQFT +
-                (self.size_dhur or 0) * DHUR_SQFT
+                terai_values[0] * BIGHA_SQFT +
+                terai_values[1] * KATHA_SQFT +
+                terai_values[2] * DHUR_SQFT
             )
-            # Clear Hilly fields if Terai fields are being used
+            # Ensure data integrity by clearing the other fields
             self.size_ropani = None
             self.size_aana = None
             self.size_paisa = None
             self.size_dam = None
         
-        # We must assign the calculated value back to the model field.
+        # Assign the calculated value back to the model field.
         self.total_land_area_sqft = total_sqft if total_sqft > 0 else None
-        super().save(*args, **kwargs) # Call the original save method
+
+        super().save(*args, **kwargs) # Call the original save method to save all changes.
 
     # --- Road Information ---
     road_size_min_ft = models.PositiveIntegerField(blank=True, null=True, help_text="For 'Buy' listings only.")
