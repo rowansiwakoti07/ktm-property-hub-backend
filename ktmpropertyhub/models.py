@@ -88,7 +88,7 @@ class PropertyListing(models.Model):
 
     # --- Price ---
     # For 'Sell'/'Rent', we can use just 'price_max'. For 'Buy', use both.
-    price_min = models.DecimalField(max_digits=14, decimal_places=2, blank=True, null=True, help_text="For 'Buy' listings only.")
+    price_min = models.DecimalField(max_digits=14, decimal_places=2, blank=True, null=True, help_text="Minium price of the property.")
     price = models.DecimalField(max_digits=14, decimal_places=2, blank=True, null=True)
     
     class PriceNegotiability(models.TextChoices):
@@ -165,7 +165,7 @@ class PropertyListing(models.Model):
         super().save(*args, **kwargs) # Call the original save method to save all changes.
 
     # --- Road Information ---
-    road_size_min_ft = models.PositiveIntegerField(blank=True, null=True, help_text="For 'Buy' listings only.")
+    road_size_min_ft = models.PositiveIntegerField(blank=True, null=True, help_text="Minimum size of the road.")
     road_size_ft = models.PositiveIntegerField(blank=True, null=True)
     
     class RoadCondition(models.TextChoices):
@@ -212,19 +212,19 @@ class PropertyListing(models.Model):
     built_year_bs = models.PositiveIntegerField(blank=True, null=True, help_text="Year of construction in Bikram Sambat.")
     built_year_ad = models.PositiveIntegerField(blank=True, null=True, help_text="Year of construction in AD.")
     
-    floors_min = models.PositiveIntegerField(blank=True, null=True, help_text="For 'Buy' listings only.")
+    floors_min = models.PositiveIntegerField(blank=True, null=True, help_text="Minimum floors")
     floors = models.PositiveIntegerField(blank=True, null=True)
 
     # Room Details (using min/max for 'Buy' requests)
-    master_bedrooms_min = models.PositiveIntegerField(blank=True, null=True, help_text="For 'Buy' listings only.")
+    master_bedrooms_min = models.PositiveIntegerField(blank=True, null=True, help_text="Minimum master bedrooms.")
     master_bedrooms = models.PositiveIntegerField(blank=True, null=True)
-    common_bedrooms_min = models.PositiveIntegerField(blank=True, null=True, help_text="For 'Buy' listings only.")
+    common_bedrooms_min = models.PositiveIntegerField(blank=True, null=True, help_text="Minimum common bedrooms.")
     common_bedrooms = models.PositiveIntegerField(blank=True, null=True)
-    common_bathrooms_min = models.PositiveIntegerField(blank=True, null=True, help_text="For 'Buy' listings only.")
+    common_bathrooms_min = models.PositiveIntegerField(blank=True, null=True, help_text="Minimum common bathrooms.")
     common_bathrooms = models.PositiveIntegerField(blank=True, null=True)
-    living_rooms_min = models.PositiveIntegerField(blank=True, null=True, help_text="For 'Buy' listings only.")
+    living_rooms_min = models.PositiveIntegerField(blank=True, null=True, help_text="Minimum living rooms.")
     living_rooms = models.PositiveIntegerField(blank=True, null=True)
-    kitchens_min = models.PositiveIntegerField(blank=True, null=True, help_text="For 'Buy' listings only.")
+    kitchens_min = models.PositiveIntegerField(blank=True, null=True, help_text="Minimum kitchens.")
     kitchens = models.PositiveIntegerField(blank=True, null=True)
     
     has_laundry = models.BooleanField(default=False)
@@ -238,9 +238,9 @@ class PropertyListing(models.Model):
 
     furnishing = models.CharField(max_length=10, choices=Furnishing.choices, blank=True, null=True)
     
-    parking_car_min = models.PositiveIntegerField(blank=True, null=True, help_text="For 'Buy' listings only.")
+    parking_car_min = models.PositiveIntegerField(blank=True, null=True, help_text="Minimum car parking.")
     parking_car = models.PositiveIntegerField(blank=True, null=True)
-    parking_bike_min = models.PositiveIntegerField(blank=True, null=True, help_text="For 'Buy' listings only.")
+    parking_bike_min = models.PositiveIntegerField(blank=True, null=True, help_text="Minimum bike parking.")
     parking_bike = models.PositiveIntegerField(blank=True, null=True)
     
     # --- Rental Specific Fields ---
