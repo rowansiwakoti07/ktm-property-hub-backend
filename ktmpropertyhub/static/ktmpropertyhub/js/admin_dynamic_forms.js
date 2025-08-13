@@ -23,11 +23,13 @@ document.addEventListener('DOMContentLoaded', function () {
         sellOrRentSpecificFields: [
             '.field-price_negotiable'
         ],
+        sellOrRentHouseAndAptFields: [
+            '.field-built_year_bs', '.field-built_year_ad'
+        ],
         landSpecificFields: ['.field-land_type'],
         houseAndApartmentFields: [
-            '.field-property_condition', '.field-built_year_bs', '.field-built_year_ad',
-            '.field-has_laundry', '.field-has_store', '.field-has_puja_room',
-            '.field-furnishing'
+            '.field-property_condition', '.field-has_laundry',
+            '.field-has_store', '.field-has_puja_room', '.field-furnishing'
         ]
     };
 
@@ -37,6 +39,7 @@ document.addEventListener('DOMContentLoaded', function () {
         ...SELECTORS.singleValueOrRangeMaxFields,
         ...SELECTORS.rentSpecificFields,
         ...SELECTORS.sellOrRentSpecificFields,
+        ...SELECTORS.sellOrRentHouseAndAptFields,
         ...SELECTORS.landSpecificFields,
         ...SELECTORS.houseAndApartmentFields
     ]));
@@ -81,20 +84,19 @@ document.addEventListener('DOMContentLoaded', function () {
         // --- Rules based on Listing Purpose ---
         if (purpose === 'BUY') {
             toggleVisibility(SELECTORS.buyRangeMinFields, true);
-            // Re-ensure max fields are visible to form the range
             if (type === 'HOUSE' || type === 'APARTMENT') {
                 toggleVisibility(SELECTORS.singleValueOrRangeMaxFields, true);
             }
         } else if (purpose === 'SELL' || purpose === 'RENT') {
-            // Hide min fields, show single/max fields, and show negotiable field.
             toggleVisibility(SELECTORS.buyRangeMinFields, false);
-            toggleVisibility(SELECTORS.sellOrRentSpecificFields, true); // Show 'Negotiable'
+            toggleVisibility(SELECTORS.sellOrRentSpecificFields, true);
+            // Show build years ONLY for Sell or Rent for House/Apt
             if (type === 'HOUSE' || type === 'APARTMENT') {
                 toggleVisibility(SELECTORS.singleValueOrRangeMaxFields, true);
+                toggleVisibility(SELECTORS.sellOrRentHouseAndAptFields, true);
             }
         }
 
-        // Handle rent-specific fields separately
         if (purpose === 'RENT') {
             toggleVisibility(SELECTORS.rentSpecificFields, true);
         }
@@ -103,6 +105,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (type === 'LAND') {
             const trulyNotForLand = [
                 ...SELECTORS.houseAndApartmentFields,
+                ...SELECTORS.sellOrRentHouseAndAptFields,
                 '.field-floors_min', '.field-floors', '.field-master_bedrooms_min',
                 '.field-master_bedrooms', '.field-common_bedrooms_min', '.field-common_bedrooms',
                 '.field-common_bathrooms_min', '.field-common_bathrooms', '.field-living_rooms_min',
@@ -112,11 +115,11 @@ document.addEventListener('DOMContentLoaded', function () {
             ];
             toggleVisibility(trulyNotForLand, false);
 
-            // Explicitly re-show the price fields for Land based on purpose.
+            // Explicitly re-show the price and road size fields for Land based on purpose.
             if (purpose === 'BUY') {
-                toggleVisibility(['.field-price_min', '.field-price'], true);
+                toggleVisibility(['.field-price_min', '.field-price', '.field-road_size_min_ft', '.field-road_size_ft'], true);
             } else if (purpose === 'SELL' || purpose === 'RENT') {
-                toggleVisibility(['.field-price'], true);
+                toggleVisibility(['.field-price', '.field-road_size_ft'], true);
             }
         }
     };
