@@ -1,103 +1,125 @@
 // Wait for the DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function () {
-    // --- 1. CONFIGURATION (SEMANTICALLY CORRECT) ---
+    // --- 1. CONFIGURATION ---
+    // All selectors are defined in one clear, easily updatable object.
     const SELECTORS = {
         purpose: '#id_listing_purpose',
         propertyType: '#id_property_type',
 
-        // Fields that ONLY appear for 'BUY' (the "min" part of a range)
-        minRangeFields: [
+        // Groups are now defined by what they ARE, not what they are not.
+        buyRangeMinFields: [
             '.field-price_min', '.field-road_size_min_ft', '.field-floors_min',
             '.field-master_bedrooms_min', '.field-common_bedrooms_min',
             '.field-common_bathrooms_min', '.field-living_rooms_min',
             '.field-kitchens_min', '.field-parking_car_min', '.field-parking_bike_min'
         ],
-
-        // Fields that appear for BUY, SELL, or RENT (the "max" part of a range or a single value)
-        maxRangeOrSingleValueFields: [
+        singleValueOrRangeMaxFields: [
             '.field-price', '.field-road_size_ft', '.field-floors',
             '.field-master_bedrooms', '.field-common_bedrooms',
             '.field-common_bathrooms', '.field-living_rooms',
             '.field-kitchens', '.field-parking_car', '.field-parking_bike'
         ],
-
-        // Fields that ONLY appear for 'RENT'
-        rentOnlyFields: [
+        rentSpecificFields: [
             '.field-rent_duration_value', '.field-rent_duration_unit', '.field-rent_period'
         ],
-
-        // Fields that ONLY appear for 'LAND'
-        landOnlyFields: ['.field-land_type'],
-
-        // Fields that should NEVER appear for 'LAND'
-        notForLandFields: [
+        landSpecificFields: ['.field-land_type'],
+        houseAndApartmentFields: [
             '.field-property_condition', '.field-built_year_bs', '.field-built_year_ad',
-            '.field-floors_min', '.field-floors', '.field-master_bedrooms_min',
-            '.field-master_bedrooms', '.field-common_bedrooms_min', '.field-common_bedrooms',
-            '.field-common_bathrooms_min', '.field-common_bathrooms', '.field-living_rooms_min',
-            '.field-living_rooms', '.field-kitchens_min', '.field-kitchens',
             '.field-has_laundry', '.field-has_store', '.field-has_puja_room',
-            '.field-furnishing', '.field-parking_car_min', '.field-parking_car',
-            '.field-parking_bike_min', '.field-parking_bike'
+            '.field-furnishing'
         ]
     };
+
+    // --- Create a MASTER list of all fields we control ---
+    const allControlledSelectors = [
+        ...SELECTORS.buyRangeMinFields,
+        ...SELECTORS.singleValueOrRangeMaxFields,
+        ...SELECTORS.rentSpecificFields,
+        ...SELECTORS.landSpecificFields,
+        ...SELECTORS.houseAndApartmentFields
+    ];
 
     const purposeSelect = document.querySelector(SELECTORS.purpose);
     const propertyTypeSelect = document.querySelector(SELECTORS.propertyType);
 
     if (!purposeSelect || !propertyTypeSelect) {
-        return;
+        return; // Exit safely
     }
 
-    // --- 2. THE STATE MACHINE LOGIC ---
-    const determineVisibility = () => {
-        const purpose = purposeSelect.value;
-        const type = propertyTypeSelect.value;
-        const visibilityMap = {};
-
-        const setVisibility = (selectors, isVisible) => {
-            selectors.forEach(selector => { visibilityMap[selector] = isVisible; });
-        };
-
-        // --- Rules Engine (Now Correctly Reflects Your Logic) ---
-
-        // Rule 1: The 'min' fields are ONLY visible for 'BUY'.
-        setVisibility(SELECTORS.minRangeFields, purpose === 'BUY');
-
-        // Rule 2: The 'max'/single-value fields are visible if ANY purpose is selected.
-        const anyPurposeSelected = purpose !== '';
-        setVisibility(SELECTORS.maxRangeOrSingleValueFields, anyPurposeSelected);
-
-        // Rule 3: The rent-specific fields are ONLY visible for 'RENT'.
-        setVisibility(SELECTORS.rentOnly, purpose === 'RENT');
-
-        // Rule 4: The land-type field is ONLY visible for 'LAND'.
-        setVisibility(SELECTORS.landOnly, type === 'LAND');
-
-        // Rule 5 (The Final Override): If type is LAND, it ALWAYS hides 'notForLand' fields.
-        // This is the most important rule and runs last to ensure it wins any conflict.
-        if (type === 'LAND') {
-            setVisibility(SELECTORS.notForLand, false);
-        }
-
-        return visibilityMap;
-    };
-
-    // --- 3. THE RENDERER (No changes needed) ---
-    const renderForm = () => {
-        const visibilityMap = determineVisibility();
-        for (const selector in visibilityMap) {
+    // Helper function to make showing/hiding cleaner
+    const toggleVisibility = (selectors, show) => {
+        selectors.forEach(selector => {
             const fieldRow = document.querySelector(selector);
             if (fieldRow) {
-                fieldRow.style.display = visibilityMap[selector] ? 'block' : 'none';
+                fieldRow.style.display = show ? 'block' : 'none';
+            }
+        });
+    };
+
+    // --- 2. THE DEFINITIVE LOGIC FUNCTION ---
+    const updateFormVisibility = () => {
+        const purpose = purposeSelect.value;
+        const type = propertyTypeSelect.value;
+
+        // --- STEP 1: RESET. Hide EVERYTHING first. This is the key. ---
+        toggleVisibility(allControlledSelectors, false);
+
+        // --- STEP 2: REBUILD. Explicitly SHOW what is needed. ---
+        // If no purpose or type is selected, we stop here, and everything remains hidden.
+        if (!purpose || !type) {
+            return;
+        }
+
+        // Rule for Property Type
+        if (type === 'LAND') {
+            toggleVisibility(SELECTORS.landSpecificFields, true);
+        } else if (type === 'HOUSE' || type === 'APARTMENT') {
+            toggleVisibility(SELECTORS.houseAndApartmentFields, true);
+            // Also show the single/max fields for House/Apt by default
+            toggleVisibility(SELECTORS.singleValueOrRangeMaxFields, true);
+        }
+
+        // Rule for Listing Purpose (which can now correctly override the above)
+        if (purpose === 'BUY') {
+            toggleVisibility(SELECTORS.buyRangeMinFields, true);
+            // Ensure single/max fields are also visible for BUY
+            toggleVisibility(SELECTORS.singleValueOrRangeMaxFields, true);
+        } else if (purpose === 'SELL') {
+            // Hide min fields, show single/max fields
+            toggleVisibility(SELECTORS.buyRangeMinFields, false);
+            toggleVisibility(SELECTORS.singleValueOrRangeMaxFields, true);
+        } else if (purpose === 'RENT') {
+            // Hide min fields, show single/max fields AND rent fields
+            toggleVisibility(SELECTORS.buyRangeMinFields, false);
+            toggleVisibility(SELECTORS.singleValueOrRangeMaxFields, true);
+            toggleVisibility(SELECTORS.rentSpecificFields, true);
+        }
+
+        // Final Override: If it's LAND, none of the house/apt fields should show, ever.
+        if (type === 'LAND') {
+            const houseAptAndRangeFields = [
+                ...SELECTORS.buyRangeMinFields,
+                ...SELECTORS.singleValueOrRangeMaxFields,
+                ...SELECTORS.houseAndApartmentFields
+            ];
+            toggleVisibility(houseAptAndRangeFields, false);
+            // But we still need to show the land-specific fields
+            toggleVisibility(SELECTORS.landSpecificFields, true);
+
+            // And potentially the price range for buying land
+            if (purpose === 'BUY') {
+                toggleVisibility(['.field-price_min'], true);
+            }
+            if (purpose === 'SELL' || purpose === 'RENT') {
+                toggleVisibility(['.field-price'], true);
             }
         }
     };
 
-    // --- 4. EVENT LISTENERS (No changes needed) ---
-    purposeSelect.addEventListener('change', renderForm);
-    propertyTypeSelect.addEventListener('change', renderForm);
+    // --- 3. EVENT LISTENERS ---
+    purposeSelect.addEventListener('change', updateFormVisibility);
+    propertyTypeSelect.addEventListener('change', updateFormVisibility);
 
     // Initial render on page load
-    renderForm();
+    updateFormVisibility();
 });
