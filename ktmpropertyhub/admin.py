@@ -7,63 +7,74 @@ from django.utils.html import format_html
 import cloudinary.uploader
 import time
 
-
 @admin.register(Facility)
 class FacilityAdmin(admin.ModelAdmin):
     list_display = ('name', 'id')
     search_fields = ('name',)
 
-
 class PropertyListingAdminForm(forms.ModelForm):
     upload_new_images = MultiMediaField(
-        min_num=0, max_num=20, max_file_size=1024 * 1024 * 8,
+        min_num=0, max_num=20, max_file_size=1024*1024*8,
         required=False, help_text='Select and upload multiple new images for this property.'
     )
-
     class Meta:
         model = PropertyListing
         fields = '__all__'
 
-
 @admin.register(PropertyListing)
 class PropertyListingAdmin(admin.ModelAdmin):
     form = PropertyListingAdminForm
-
-    # Tables & filters
     list_display = ('title', 'listing_purpose', 'property_type', 'user', 'is_active', 'image_count')
     list_filter = ('listing_purpose', 'property_type', 'is_active', 'state', 'district')
     search_fields = ('title', 'local_area', 'user__username')
     list_per_page = 25
-
-    # Readonly admin method field
     readonly_fields = ('get_existing_images_preview',)
 
-    # ✅ No fieldsets — just a flat, ordered list of fields
-    fields = [
-        'listing_purpose', 'property_type', 'user', 'title', 'description', 'is_active',
-        'state', 'district', 'local_area',
-        'price_min', 'price', 'price_negotiable',
-        'ropani', 'aana', 'paisa', 'dam',
-        'bigha', 'katha', 'dhur',
-        'total_land_area_sqft',  # will be rendered as an input; we’ll set it readonly via widget
-        'road_size_min_ft', 'road_size_ft', 'road_condition', 'facing_direction',
-        'land_type', 'property_condition', 'built_year_bs', 'built_year_ad',
-        'floors_min', 'floors',
-        'master_bedrooms_min', 'master_bedrooms',
-        'common_bedrooms_min', 'common_bedrooms',
-        'common_bathrooms_min', 'common_bathrooms',
-        'living_rooms_min', 'living_rooms',
-        'kitchens_min', 'kitchens',
-        'has_laundry', 'has_store', 'has_puja_room',
-        'furnishing', 'facilities', 'other_facilities',
-        'parking_car_min', 'parking_car', 'parking_bike_min', 'parking_bike',
-        'rent_duration_value', 'rent_duration_unit', 'rent_period',
-        'upload_new_images', 'get_existing_images_preview',
-    ]
+    # --- THIS IS THE CORE OF THE FUNCTIONAL UI SOLUTION ---
+    # We use fieldsets to group the fields logically and provide clear headers.
+    fieldsets = (
+        (None, {
+            'fields': ('listing_purpose', 'property_type', 'user', 'title', 'description', 'is_active')
+        }),
+        ('Location', {
+            'fields': ('state', 'district', 'local_area')
+        }),
+        ('Price', {
+            'fields': ('price_min', 'price', 'price_negotiable')
+        }),
+        # We create a dedicated section for Land Size
+        ('Land Size', {
+            'description': 'Enter measurements for either Hilly or Terai area. Entering a value in one section will clear the other.',
+            'fields': (
+                # We can group them on the same line
+                ('ropani', 'aana', 'paisa', 'dam'),
+                ('bigha', 'katha', 'dhur'),
+                'total_land_area_sqft', # Display the calculated result
+            )
+        }),
+        ('Road Information', {
+            'fields': ('road_size_min_ft', 'road_size_ft', 'road_condition', 'facing_direction')
+        }),
+        ('Property & Room Details', {
+            'fields': ('land_type', 'property_condition', 'built_year_bs', 'built_year_ad', 'floors_min', 'floors', 'master_bedrooms_min', 'master_bedrooms', 'common_bedrooms_min', 'common_bedrooms', 'common_bathrooms_min', 'common_bathrooms', 'living_rooms_min', 'living_rooms', 'kitchens_min', 'kitchens')
+        }),
+        ('Features & Facilities', {
+            'fields': ('has_laundry', 'has_store', 'has_puja_room', 'furnishing', 'facilities', 'other_facilities')
+        }),
+        ('Parking', {
+            'fields': ('parking_car_min', 'parking_car', 'parking_bike_min', 'parking_bike')
+        }),
+        ('Rental Details', {
+            'fields': ('rent_duration_value', 'rent_duration_unit', 'rent_period')
+        }),
+        ('Image Upload', {
+            'fields': ('upload_new_images', 'get_existing_images_preview')
+        })
+    )
 
     def get_form(self, request, obj=None, **kwargs):
         """
-        Hook to add CSS classes for JS and make total_land_area_sqft a readonly <input>.
+        This is a hook to add CSS classes to our form fields for the JS to find.
         """
         form = super().get_form(request, obj, **kwargs)
 
