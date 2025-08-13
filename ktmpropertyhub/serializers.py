@@ -46,7 +46,6 @@ class PropertyListingSerializer(serializers.ModelSerializer):
             'id', 'listing_purpose', 'property_type', 'user', 'title', 
             'description', 'created_at', 'updated_at', 'is_active', 'state', 
             'district', 'local_area', 'price_min', 'price', 'price_negotiable',
-            'land_size_1_value', 'land_size_1_unit', 'land_size_2_value', 'land_size_2_unit',
             'road_size_min_ft', 'road_size_ft', 'road_condition', 'facing_direction',
             'land_type', 'property_condition', 'built_year_bs', 'built_year_ad',
             'floors_min', 'floors', 'master_bedrooms_min', 'master_bedrooms',
@@ -56,5 +55,8 @@ class PropertyListingSerializer(serializers.ModelSerializer):
             'has_puja_room', 'furnishing', 'parking_car_min', 'parking_car',
             'parking_bike_min', 'parking_bike', 'rent_duration_value',
             'rent_duration_unit', 'rent_period', 'other_facilities',
-            'facilities', 'images', 'state', 'district', 'state_id', 'district_id'
+            'facilities', 'images', 'state', 'district', 'state_id', 'district_id',
+             # --- THE NEW LAND SIZE FIELDS FOR THE API ---
+            'size_ropani', 'size_aana', 'size_paisa', 'size_dam',
+            'size_bigha', 'size_katha', 'size_dhur', 'total_land_area_sqft',
         ]

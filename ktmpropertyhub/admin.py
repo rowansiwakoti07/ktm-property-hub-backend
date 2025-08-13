@@ -28,7 +28,65 @@ class PropertyListingAdmin(admin.ModelAdmin):
     list_filter = ('listing_purpose', 'property_type', 'is_active', 'state', 'district')
     search_fields = ('title', 'local_area', 'user__username')
     list_per_page = 25
-    readonly_fields = ('get_existing_images_preview',)
+    readonly_fields = ('get_existing_images_preview', 'total_land_area_sqft')
+
+    # --- THIS IS THE CORE OF THE FUNCTIONAL UI SOLUTION ---
+    # We use fieldsets to group the fields logically and provide clear headers.
+    fieldsets = (
+        (None, {
+            'fields': ('listing_purpose', 'property_type', 'user', 'title', 'description', 'is_active')
+        }),
+        ('Location', {
+            'fields': ('state', 'district', 'local_area')
+        }),
+        ('Price', {
+            'fields': ('price_min', 'price', 'price_negotiable')
+        }),
+        # We create a dedicated section for Land Size
+        ('Land Size', {
+            'description': 'Enter measurements for either Hilly or Terai area. Entering a value in one section will clear the other.',
+            'fields': (
+                # We can group them on the same line
+                ('size_ropani', 'size_aana', 'size_paisa', 'size_dam'),
+                ('size_bigha', 'size_katha', 'size_dhur'),
+                'total_land_area_sqft', # Display the calculated result
+            )
+        }),
+        ('Road Information', {
+            'fields': ('road_size_min_ft', 'road_size_ft', 'road_condition', 'facing_direction')
+        }),
+        ('Property & Room Details', {
+            'fields': ('land_type', 'property_condition', 'built_year_bs', 'built_year_ad', 'floors_min', 'floors', 'master_bedrooms_min', 'master_bedrooms', 'common_bedrooms_min', 'common_bedrooms', 'common_bathrooms_min', 'common_bathrooms', 'living_rooms_min', 'living_rooms', 'kitchens_min', 'kitchens')
+        }),
+        ('Features & Facilities', {
+            'fields': ('has_laundry', 'has_store', 'has_puja_room', 'furnishing', 'facilities', 'other_facilities')
+        }),
+        ('Parking', {
+            'fields': ('parking_car_min', 'parking_car', 'parking_bike_min', 'parking_bike')
+        }),
+        ('Rental Details', {
+            'fields': ('rent_duration_value', 'rent_duration_unit', 'rent_period')
+        }),
+        ('Image Upload', {
+            'fields': ('upload_new_images', 'get_existing_images_preview')
+        })
+    )
+
+    def get_form(self, request, obj=None, **kwargs):
+        """
+        This is a hook to add CSS classes to our form fields for the JS to find.
+        """
+        form = super().get_form(request, obj, **kwargs)
+        # Hilly fields
+        form.base_fields['size_ropani'].widget.attrs['class'] = 'hilly-area-input'
+        form.base_fields['size_aana'].widget.attrs['class'] = 'hilly-area-input'
+        form.base_fields['size_paisa'].widget.attrs['class'] = 'hilly-area-input'
+        form.base_fields['size_dam'].widget.attrs['class'] = 'hilly-area-input'
+        # Terai fields
+        form.base_fields['size_bigha'].widget.attrs['class'] = 'terai-area-input'
+        form.base_fields['size_katha'].widget.attrs['class'] = 'terai-area-input'
+        form.base_fields['size_dhur'].widget.attrs['class'] = 'terai-area-input'
+        return form
     
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
@@ -87,5 +145,6 @@ class PropertyListingAdmin(admin.ModelAdmin):
         # The path is relative to your app's static directory
         js = (
             'ktmpropertyhub/js/admin_filters.js',         # For State/District dropdowns
-            'ktmpropertyhub/js/admin_dynamic_forms.js'    # For ALL conditional fields
+            'ktmpropertyhub/js/admin_dynamic_forms.js',    # For ALL conditional fields
+            'ktmpropertyhub/js/admin_land_size.js'
         )

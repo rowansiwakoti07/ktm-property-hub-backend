@@ -97,14 +97,56 @@ class PropertyListing(models.Model):
 
     price_negotiable = models.CharField(max_length=10, choices=PriceNegotiability.choices, blank=True, null=True)
 
-    # --- Land & House Size ---
-    # Store all land sizes in a base unit like sq.ft internally for easy comparison.
-    # The form can handle the conversion. For simplicity here, we store units.
-    # Using two fields to capture composite sizes like "5 Ropani and 5 Aana".
-    land_size_1_value = models.FloatField(blank=True, null=True)
-    land_size_1_unit = models.CharField(max_length=20, blank=True, null=True)
-    land_size_2_value = models.FloatField(blank=True, null=True)
-    land_size_2_unit = models.CharField(max_length=20, blank=True, null=True)
+    # Hilly Area Units (as integers, since you can't have half a ropani)
+    size_ropani = models.PositiveIntegerField(null=True, blank=True)
+    size_aana = models.PositiveIntegerField(null=True, blank=True)
+    size_paisa = models.PositiveIntegerField(null=True, blank=True)
+    size_dam = models.PositiveIntegerField(null=True, blank=True)
+
+    # Terai Area Units
+    size_bigha = models.PositiveIntegerField(null=True, blank=True)
+    size_katha = models.PositiveIntegerField(null=True, blank=True)
+    size_dhur = models.PositiveIntegerField(null=True, blank=True)
+    
+    # The Standardized, Calculated Value (for searching, filtering, and API)
+    # We use a FloatField to handle the decimal precision from the conversions.
+    total_land_area_sqft = models.FloatField(null=True, blank=True, help_text="Total land area in square feet, calculated automatically.")
+
+    def save(self, *args, **kwargs):
+        """
+        Override the save method to automatically calculate the total square feet.
+        """
+        # Conversion factors (as integers or floats for precision)
+        ROPANI_SQFT = 5476
+        AANA_SQFT = 342.25  # 1 Ropani / 16
+        PAISA_SQFT = 85.56  # 1 Aana / 4
+        DAM_SQFT = 21.39    # 1 Paisa / 4
+
+        BIGHA_SQFT = 72900
+        KATHA_SQFT = 3645   # 1 Bigha / 20
+        DHUR_SQFT = 182.25  # 1 Katha / 20
+
+        total_sqft = 0
+        
+        # Prefer Hilly calculation if any Hilly field is filled
+        if self.size_ropani or self.size_aana or self.size_paisa or self.size_dam:
+            total_sqft = (
+                (self.size_ropani or 0) * ROPANI_SQFT +
+                (self.size_aana or 0) * AANA_SQFT +
+                (self.size_paisa or 0) * PAISA_SQFT +
+                (self.size_dam or 0) * DAM_SQFT
+            )
+        # Otherwise, use Terai calculation
+        elif self.size_bigha or self.size_katha or self.size_dhur:
+            total_sqft = (
+                (self.size_bigha or 0) * BIGHA_SQFT +
+                (self.size_katha or 0) * KATHA_SQFT +
+                (self.size_dhur or 0) * DHUR_SQFT
+            )
+        
+        self.total_land_area_sqft = total_sqft if total_sqft > 0 else None
+
+        super().save(*args, **kwargs) # Call the original save method
 
     # --- Road Information ---
     road_size_min_ft = models.PositiveIntegerField(blank=True, null=True, help_text="For 'Buy' listings only.")
