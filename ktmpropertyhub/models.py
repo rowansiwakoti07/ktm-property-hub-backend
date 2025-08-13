@@ -227,7 +227,7 @@ class PropertyListing(models.Model):
     kitchens_min = models.PositiveIntegerField(blank=True, null=True, help_text="Minimum kitchens.")
     kitchens = models.PositiveIntegerField(blank=True, null=True)
     built_up_area_min_sqft = models.PositiveIntegerField(blank=True, null=True, help_text="Minimum built-up area in square feet")
-    built_up_area_sqft = models.PositiveIntegerField(blank=True, null=True)
+    built_up_area_sqft = models.PositiveIntegerField(blank=True, null=True, help_text="Built-up area in square feet")
     
     has_laundry = models.BooleanField(default=False)
     has_store = models.BooleanField(default=False)
