@@ -77,15 +77,19 @@ class PropertyListingAdmin(admin.ModelAdmin):
         This is a hook to add CSS classes to our form fields for the JS to find.
         """
         form = super().get_form(request, obj, **kwargs)
-        # Hilly fields
-        form.base_fields['size_ropani'].widget.attrs['class'] = 'hilly-area-input'
-        form.base_fields['size_aana'].widget.attrs['class'] = 'hilly-area-input'
-        form.base_fields['size_paisa'].widget.attrs['class'] = 'hilly-area-input'
-        form.base_fields['size_dam'].widget.attrs['class'] = 'hilly-area-input'
-        # Terai fields
-        form.base_fields['size_bigha'].widget.attrs['class'] = 'terai-area-input'
-        form.base_fields['size_katha'].widget.attrs['class'] = 'terai-area-input'
-        form.base_fields['size_dhur'].widget.attrs['class'] = 'terai-area-input'
+
+        hilly_attrs = {'class': 'hilly-area-input'}
+        terai_attrs = {'class': 'terai-area-input'}
+
+        form.base_fields['size_ropani'].widget.attrs.update(hilly_attrs)
+        form.base_fields['size_aana'].widget.attrs.update(hilly_attrs)
+        form.base_fields['size_paisa'].widget.attrs.update(hilly_attrs)
+        form.base_fields['size_dam'].widget.attrs.update(hilly_attrs)
+        
+        form.base_fields['size_bigha'].widget.attrs.update(terai_attrs)
+        form.base_fields['size_katha'].widget.attrs.update(terai_attrs)
+        form.base_fields['size_dhur'].widget.attrs.update(terai_attrs)
+        
         return form
     
     def save_model(self, request, obj, form, change):

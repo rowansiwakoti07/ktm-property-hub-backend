@@ -2,6 +2,7 @@ from rest_framework import viewsets
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import PropertyListing, State, District
 from .serializers import PropertyListingSerializer, StateSerializer, DistrictSerializer
+from django_filters import rest_framework as filters
 
 class StateViewSet(viewsets.ReadOnlyModelViewSet):
     """
@@ -19,6 +20,14 @@ class DistrictViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = DistrictSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['state'] # Enable filtering by the 'state' foreign key
+
+class PropertyFilter(filters.FilterSet):
+    min_sqft = filters.NumberFilter(field_name="total_land_area_sqft", lookup_expr='gte')
+    max_sqft = filters.NumberFilter(field_name="total_land_area_sqft", lookup_expr='lte')
+
+    class Meta:
+        model = PropertyListing
+        fields = ['listing_purpose', 'property_type', 'state', 'district', 'min_sqft', 'max_sqft']
 
 class PropertyListingViewSet(viewsets.ReadOnlyModelViewSet):
     """
@@ -38,3 +47,6 @@ class PropertyListingViewSet(viewsets.ReadOnlyModelViewSet):
     # --- Filtering Configuration ---
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['listing_purpose', 'property_type', 'state', 'district']
+
+    # Use our new custom filter class
+    filterset_class = PropertyFilter # GET /api/properties/?min_sqft=1000&max_sqft=2000
