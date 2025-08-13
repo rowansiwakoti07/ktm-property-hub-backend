@@ -20,6 +20,9 @@ document.addEventListener('DOMContentLoaded', function () {
         rentSpecificFields: [
             '.field-rent_duration_value', '.field-rent_duration_unit', '.field-rent_period'
         ],
+        sellOrRentSpecificFields: [
+            '.field-price_negotiable'
+        ],
         landSpecificFields: ['.field-land_type'],
         houseAndApartmentFields: [
             '.field-property_condition', '.field-built_year_bs', '.field-built_year_ad',
@@ -29,10 +32,11 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     // Create a master list of all fields we control for the reset step.
-    const allControlledSelectors = Array.from(new Set([ // Use a Set to remove duplicates
+    const allControlledSelectors = Array.from(new Set([
         ...SELECTORS.buyRangeMinFields,
         ...SELECTORS.singleValueOrRangeMaxFields,
         ...SELECTORS.rentSpecificFields,
+        ...SELECTORS.sellOrRentSpecificFields,
         ...SELECTORS.landSpecificFields,
         ...SELECTORS.houseAndApartmentFields
     ]));
@@ -41,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const propertyTypeSelect = document.querySelector(SELECTORS.propertyType);
 
     if (!purposeSelect || !propertyTypeSelect) {
-        return; // Exit safely
+        return;
     }
 
     const toggleVisibility = (selectors, show) => {
@@ -58,50 +62,45 @@ document.addEventListener('DOMContentLoaded', function () {
         const purpose = purposeSelect.value;
         const type = propertyTypeSelect.value;
 
-        // --- STEP 1: RESET. Hide EVERYTHING first. This is the key. ---
+        // --- STEP 1: RESET. Hide EVERYTHING first. ---
         toggleVisibility(allControlledSelectors, false);
 
         // --- STEP 2: REBUILD. Explicitly SHOW what is needed. ---
         if (!purpose || !type) {
-            return; // If either dropdown is empty, do nothing.
+            return;
         }
 
         // --- Rules based on Property Type ---
         if (type === 'LAND') {
             toggleVisibility(SELECTORS.landSpecificFields, true);
         } else if (type === 'HOUSE' || type === 'APARTMENT') {
-            // Show fields common to both House and Apartment
             toggleVisibility(SELECTORS.houseAndApartmentFields, true);
-            // Show the single/max fields that are also common to them
             toggleVisibility(SELECTORS.singleValueOrRangeMaxFields, true);
         }
 
-        // --- Rules based on Listing Purpose (these will apply ON TOP of the type rules) ---
+        // --- Rules based on Listing Purpose ---
         if (purpose === 'BUY') {
             toggleVisibility(SELECTORS.buyRangeMinFields, true);
-            // Re-ensure single/max fields are also visible to form the range
+            // Re-ensure max fields are visible to form the range
             if (type === 'HOUSE' || type === 'APARTMENT') {
                 toggleVisibility(SELECTORS.singleValueOrRangeMaxFields, true);
             }
-        } else if (purpose === 'SELL') {
-            // For Sell, we only want the single/max fields
+        } else if (purpose === 'SELL' || purpose === 'RENT') {
+            // Hide min fields, show single/max fields, and show negotiable field.
             toggleVisibility(SELECTORS.buyRangeMinFields, false);
+            toggleVisibility(SELECTORS.sellOrRentSpecificFields, true); // Show 'Negotiable'
             if (type === 'HOUSE' || type === 'APARTMENT') {
                 toggleVisibility(SELECTORS.singleValueOrRangeMaxFields, true);
             }
-        } else if (purpose === 'RENT') {
-            // For Rent, we want single/max fields AND rent fields
-            toggleVisibility(SELECTORS.buyRangeMinFields, false);
-            if (type === 'HOUSE' || type === 'APARTMENT') {
-                toggleVisibility(SELECTORS.singleValueOrRangeMaxFields, true);
-            }
+        }
+
+        // Handle rent-specific fields separately
+        if (purpose === 'RENT') {
             toggleVisibility(SELECTORS.rentSpecificFields, true);
         }
 
         // --- FINAL OVERRIDE FOR LAND ---
-        // This runs last to ensure it has the final say.
         if (type === 'LAND') {
-            // Re-hide all fields that are absolutely not for land
             const trulyNotForLand = [
                 ...SELECTORS.houseAndApartmentFields,
                 '.field-floors_min', '.field-floors', '.field-master_bedrooms_min',
@@ -113,8 +112,7 @@ document.addEventListener('DOMContentLoaded', function () {
             ];
             toggleVisibility(trulyNotForLand, false);
 
-            // --- THIS IS THE CRITICAL FIX ---
-            // Now, explicitly re-show the price fields based on the purpose.
+            // Explicitly re-show the price fields for Land based on purpose.
             if (purpose === 'BUY') {
                 toggleVisibility(['.field-price_min', '.field-price'], true);
             } else if (purpose === 'SELL' || purpose === 'RENT') {
