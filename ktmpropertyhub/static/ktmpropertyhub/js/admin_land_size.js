@@ -16,13 +16,13 @@
 
         const calculateAndUpdateTotal = () => {
             const val = id => (document.querySelector(id)?.value || 0);
-            const ropani = val('#id_size_ropani');
-            const aana = val('#id_size_aana');
-            const paisa = val('#id_size_paisa');
-            const dam = val('#id_size_dam');
-            const bigha = val('#id_size_bigha');
-            const katha = val('#id_size_katha');
-            const dhur = val('#id_size_dhur');
+            const ropani = val('#id_ropani');
+            const aana = val('#id_aana');
+            const paisa = val('#id_paisa');
+            const dam = val('#id_dam');
+            const bigha = val('#id_bigha');
+            const katha = val('#id_katha');
+            const dhur = val('#id_dhur');
 
             const anyHilly = Array.from(hillyInputs).some(i => i.value.trim() !== '');
             let total = 0;

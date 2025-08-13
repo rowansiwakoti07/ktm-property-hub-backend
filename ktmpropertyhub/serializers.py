@@ -57,6 +57,6 @@ class PropertyListingSerializer(serializers.ModelSerializer):
             'rent_duration_unit', 'rent_period', 'other_facilities',
             'facilities', 'images', 'state', 'district', 'state_id', 'district_id',
              # --- THE NEW LAND SIZE FIELDS FOR THE API ---
-            'size_ropani', 'size_aana', 'size_paisa', 'size_dam',
-            'size_bigha', 'size_katha', 'size_dhur', 'total_land_area_sqft',
+            'ropani', 'aana', 'paisa', 'dam',
+            'bigha', 'katha', 'dhur', 'total_land_area_sqft',
         ]

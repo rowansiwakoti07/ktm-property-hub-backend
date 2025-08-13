@@ -47,8 +47,8 @@ class PropertyListingAdmin(admin.ModelAdmin):
             'description': 'Enter measurements for either Hilly or Terai area. Entering a value in one section will clear the other.',
             'fields': (
                 # We can group them on the same line
-                ('size_ropani', 'size_aana', 'size_paisa', 'size_dam'),
-                ('size_bigha', 'size_katha', 'size_dhur'),
+                ('ropani', 'aana', 'paisa', 'dam'),
+                ('bigha', 'katha', 'dhur'),
                 'total_land_area_sqft', # Display the calculated result
             )
         }),
@@ -81,14 +81,14 @@ class PropertyListingAdmin(admin.ModelAdmin):
         hilly_attrs = {'class': 'hilly-area-input'}
         terai_attrs = {'class': 'terai-area-input'}
 
-        form.base_fields['size_ropani'].widget.attrs.update(hilly_attrs)
-        form.base_fields['size_aana'].widget.attrs.update(hilly_attrs)
-        form.base_fields['size_paisa'].widget.attrs.update(hilly_attrs)
-        form.base_fields['size_dam'].widget.attrs.update(hilly_attrs)
+        form.base_fields['ropani'].widget.attrs.update(hilly_attrs)
+        form.base_fields['aana'].widget.attrs.update(hilly_attrs)
+        form.base_fields['paisa'].widget.attrs.update(hilly_attrs)
+        form.base_fields['dam'].widget.attrs.update(hilly_attrs)
         
-        form.base_fields['size_bigha'].widget.attrs.update(terai_attrs)
-        form.base_fields['size_katha'].widget.attrs.update(terai_attrs)
-        form.base_fields['size_dhur'].widget.attrs.update(terai_attrs)
+        form.base_fields['bigha'].widget.attrs.update(terai_attrs)
+        form.base_fields['katha'].widget.attrs.update(terai_attrs)
+        form.base_fields['dhur'].widget.attrs.update(terai_attrs)
 
         # make it an actual input that JS can target/update, but not user-editable
         form.base_fields['total_land_area_sqft'].widget.attrs.update({'readonly': 'readonly'})

@@ -98,15 +98,15 @@ class PropertyListing(models.Model):
     price_negotiable = models.CharField(max_length=10, choices=PriceNegotiability.choices, blank=True, null=True)
 
     # Hilly Area Units (as integers, since you can't have half a ropani)
-    size_ropani = models.PositiveIntegerField(null=True, blank=True)
-    size_aana = models.PositiveIntegerField(null=True, blank=True)
-    size_paisa = models.PositiveIntegerField(null=True, blank=True)
-    size_dam = models.PositiveIntegerField(null=True, blank=True)
+    ropani = models.PositiveIntegerField(null=True, blank=True)
+    aana = models.PositiveIntegerField(null=True, blank=True)
+    paisa = models.PositiveIntegerField(null=True, blank=True)
+    dam = models.PositiveIntegerField(null=True, blank=True)
 
     # Terai Area Units
-    size_bigha = models.PositiveIntegerField(null=True, blank=True)
-    size_katha = models.PositiveIntegerField(null=True, blank=True)
-    size_dhur = models.PositiveIntegerField(null=True, blank=True)
+    bigha = models.PositiveIntegerField(null=True, blank=True)
+    katha = models.PositiveIntegerField(null=True, blank=True)
+    dhur = models.PositiveIntegerField(null=True, blank=True)
     
     # The Standardized, Calculated Value (for searching, filtering, and API)
     # We use a FloatField to handle the decimal precision from the conversions.
@@ -130,8 +130,8 @@ class PropertyListing(models.Model):
         total_sqft = 0
         
         # Get the values, defaulting None to 0 for checks
-        hilly_values = [self.size_ropani or 0, self.size_aana or 0, self.size_paisa or 0, self.size_dam or 0]
-        terai_values = [self.size_bigha or 0, self.size_katha or 0, self.size_dhur or 0]
+        hilly_values = [self.ropani or 0, self.aana or 0, self.paisa or 0, self.dam or 0]
+        terai_values = [self.bigha or 0, self.katha or 0, self.dhur or 0]
 
         # Check if any Hilly value has been entered by the user.
         # The sum() is a robust way to see if there's any input.
@@ -143,9 +143,9 @@ class PropertyListing(models.Model):
                 hilly_values[3] * DAM_SQFT
             )
             # Ensure data integrity by clearing the other fields
-            self.size_bigha = None
-            self.size_katha = None
-            self.size_dhur = None
+            self.bigha = None
+            self.katha = None
+            self.dhur = None
         # Check if any Terai value has been entered.
         elif sum(terai_values) > 0:
             total_sqft = (
@@ -154,10 +154,10 @@ class PropertyListing(models.Model):
                 terai_values[2] * DHUR_SQFT
             )
             # Ensure data integrity by clearing the other fields
-            self.size_ropani = None
-            self.size_aana = None
-            self.size_paisa = None
-            self.size_dam = None
+            self.ropani = None
+            self.aana = None
+            self.paisa = None
+            self.dam = None
         
         # Assign the calculated value back to the model field.
         self.total_land_area_sqft = total_sqft if total_sqft > 0 else None
