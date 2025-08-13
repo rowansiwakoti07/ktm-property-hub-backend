@@ -51,7 +51,7 @@ class PropertyListingSerializer(serializers.ModelSerializer):
             'floors_min', 'floors', 'master_bedrooms_min', 'master_bedrooms',
             'common_bedrooms_min', 'common_bedrooms', 'common_bathrooms_min',
             'common_bathrooms', 'living_rooms_min', 'living_rooms',
-            'kitchens_min', 'kitchens', 'built_up_area_min', 'built_up_area', 'has_laundry', 'has_store',
+            'kitchens_min', 'kitchens', 'built_up_area_min_sqft', 'built_up_area_sqft', 'has_laundry', 'has_store',
             'has_puja_room', 'furnishing', 'parking_car_min', 'parking_car',
             'parking_bike_min', 'parking_bike', 'rent_duration_value',
             'rent_duration_unit', 'rent_period',

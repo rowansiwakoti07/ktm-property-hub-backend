@@ -9,13 +9,13 @@ document.addEventListener('DOMContentLoaded', function () {
             '.field-price_min', '.field-road_size_min_ft', '.field-floors_min',
             '.field-master_bedrooms_min', '.field-common_bedrooms_min',
             '.field-common_bathrooms_min', '.field-living_rooms_min',
-            '.field-kitchens_min', '.field-built_up_area_min', '.field-parking_car_min', '.field-parking_bike_min'
+            '.field-kitchens_min', '.field-built_up_area_min_sqft', '.field-parking_car_min', '.field-parking_bike_min'
         ],
         singleValueOrRangeMaxFields: [
             '.field-price', '.field-road_size_ft', '.field-floors',
             '.field-master_bedrooms', '.field-common_bedrooms',
             '.field-common_bathrooms', '.field-living_rooms',
-            '.field-kitchens', '.field-built_up_area', '.field-parking_car', '.field-parking_bike'
+            '.field-kitchens', '.field-built_up_area_sqft', '.field-parking_car', '.field-parking_bike'
         ],
         rentSpecificFields: [
             '.field-rent_duration_value', '.field-rent_duration_unit', '.field-rent_period'
@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 '.field-floors_min', '.field-floors', '.field-master_bedrooms_min',
                 '.field-master_bedrooms', '.field-common_bedrooms_min', '.field-common_bedrooms',
                 '.field-common_bathrooms_min', '.field-common_bathrooms', '.field-living_rooms_min',
-                '.field-living_rooms', '.field-kitchens_min', '.field-kitchens', '.field-built_up_area_min', '.field-built_up_area',
+                '.field-living_rooms', '.field-kitchens_min', '.field-kitchens', '.field-built_up_area_min_sqft', '.field-built_up_area_sqft',
                 '.field-parking_car_min', '.field-parking_car', '.field-parking_bike_min',
                 '.field-parking_bike'
             ];
