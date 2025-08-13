@@ -1,21 +1,14 @@
 // Wait for the DOM to be fully loaded
-document.addEventListener('DOMContentLoaded', function() {
-    // --- 1. CONFIGURATION AND ELEMENT SELECTION (using robust IDs) ---
-    const hillyInputs = {
-        ropani: document.querySelector('#id_size_ropani'),
-        aana: document.querySelector('#id_size_aana'),
-        paisa: document.querySelector('#id_size_paisa'),
-        dam: document.querySelector('#id_size_dam')
-    };
-    const teraiInputs = {
-        bigha: document.querySelector('#id_size_bigha'),
-        katha: document.querySelector('#id_size_katha'),
-        dhur: document.querySelector('#id_size_dhur')
-    };
+document.addEventListener('DOMContentLoaded', function () {
+    // --- 1. ELEMENT SELECTION (Using your proven class-based selectors) ---
+    const hillyInputs = document.querySelectorAll('.hilly-area-input');
+    const teraiInputs = document.querySelectorAll('.terai-area-input');
+
+    // We add the selector for the output field
     const totalSqftOutput = document.querySelector('#id_total_land_area_sqft');
-    
-    if (!hillyInputs.ropani || !teraiInputs.bigha || !totalSqftOutput) {
-        return; // Exit safely if fields are not on the page
+
+    if (hillyInputs.length === 0 || teraiInputs.length === 0 || !totalSqftOutput) {
+        return; // Exit safely if any required elements are missing
     }
 
     // --- 2. THE REAL-TIME CALCULATION LOGIC ---
@@ -26,40 +19,47 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const calculateAndUpdateTotal = () => {
         let total = 0;
-        const isHillyActive = Object.values(hillyInputs).some(input => input.value.trim() !== '');
-        
+
+        // We need the specific inputs for calculation, we can get them by their ID
+        const ropani = document.querySelector('#id_size_ropani').value || 0;
+        const aana = document.querySelector('#id_size_aana').value || 0;
+        const paisa = document.querySelector('#id_size_paisa').value || 0;
+        const dam = document.querySelector('#id_size_dam').value || 0;
+
+        const bigha = document.querySelector('#id_size_bigha').value || 0;
+        const katha = document.querySelector('#id_size_katha').value || 0;
+        const dhur = document.querySelector('#id_size_dhur').value || 0;
+
+        const isHillyActive = Array.from(hillyInputs).some(input => input.value.trim() !== '');
+
         if (isHillyActive) {
-            total = (parseInt(hillyInputs.ropani.value || 0) * CONVERSION.ROPANI_SQFT) +
-                    (parseInt(hillyInputs.aana.value || 0) * CONVERSION.AANA_SQFT) +
-                    (parseInt(hillyInputs.paisa.value || 0) * CONVERSION.PAISA_SQFT) +
-                    (parseInt(hillyInputs.dam.value || 0) * CONVERSION.DAM_SQFT);
+            total = (parseInt(ropani) * CONVERSION.ROPANI_SQFT) +
+                (parseInt(aana) * CONVERSION.AANA_SQFT) +
+                (parseInt(paisa) * CONVERSION.PAISA_SQFT) +
+                (parseInt(dam) * CONVERSION.DAM_SQFT);
         } else {
-            total = (parseInt(teraiInputs.bigha.value || 0) * CONVERSION.BIGHA_SQFT) +
-                    (parseInt(teraiInputs.katha.value || 0) * CONVERSION.KATHA_SQFT) +
-                    (parseInt(teraiInputs.dhur.value || 0) * CONVERSION.DHUR_SQFT);
+            total = (parseInt(bigha) * CONVERSION.BIGHA_SQFT) +
+                (parseInt(katha) * CONVERSION.KATHA_SQFT) +
+                (parseInt(dhur) * CONVERSION.DHUR_SQFT);
         }
+
         totalSqftOutput.value = total.toFixed(2);
     };
 
-    // --- 3. THE FIELD CLEARING LOGIC (COMBINED WITH CALCULATION) ---
+    // --- 3. YOUR PROVEN FIELD CLEARING LOGIC (with calculation added) ---
     const clearInputs = (inputs) => {
-        Object.values(inputs).forEach(input => { input.value = ''; });
+        inputs.forEach(input => {
+            input.value = '';
+        });
     };
 
-    Object.values(hillyInputs).forEach(input => {
+    hillyInputs.forEach(input => {
         input.addEventListener('input', () => {
-            clearInputs(teraiInputs);
-            calculateAndUpdateTotal(); // Recalculate on every input
+            const anyHillyValue = Array.from(hillyInputs).some(i => i.value.trim() !== '');
+            if (anyHillyValue) {
+                clearInputs(teraiInputs);
+            }
+            // Add the calculation call here
+            calculateAndUpdateTotal();
         });
     });
-
-    Object.values(teraiInputs).forEach(input => {
-        input.addEventListener('input', () => {
-            clearInputs(hillyInputs);
-            calculateAndUpdateTotal(); // Recalculate on every input
-        });
-    });
-
-    // Run once on load to calculate initial value if form is pre-filled (edit page)
-    calculateAndUpdateTotal();
-});
