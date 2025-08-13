@@ -156,6 +156,10 @@ class PropertyListing(models.Model):
             self.size_aana = None
             self.size_paisa = None
             self.size_dam = None
+        
+        # We must assign the calculated value back to the model field.
+        self.total_land_area_sqft = total_sqft if total_sqft > 0 else None
+        super().save(*args, **kwargs) # Call the original save method
 
     # --- Road Information ---
     road_size_min_ft = models.PositiveIntegerField(blank=True, null=True, help_text="For 'Buy' listings only.")
