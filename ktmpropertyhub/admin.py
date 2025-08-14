@@ -69,9 +69,6 @@ class PropertyListingAdmin(admin.ModelAdmin):
         ('Parking', {
             'fields': ('parking_car_min', 'parking_car', 'parking_bike_min', 'parking_bike')
         }),
-        ('Rental Details', {
-            'fields': ('rent_duration_value', 'rent_duration_unit', 'rent_period')
-        }),
         ('Features & Facilities', {
             'fields': ('has_laundry', 'has_store', 'has_puja_room', 'furnishing', 'facilities')
         }),
