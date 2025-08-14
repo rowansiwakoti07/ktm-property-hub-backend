@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
         rentSpecificFields: [
             '.field-rent_available_duration_unit', '.field-rent_amount', '.field-frequency'
         ],
-        sellOrRentSpecificFields: [
+        sellSpecificFields: [
             '.field-price_negotiable'
         ],
         sellOrRentHouseAndAptFields: [
@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function () {
         ...SELECTORS.buyRangeMinFields,
         ...SELECTORS.singleValueOrRangeMaxFields,
         ...SELECTORS.rentSpecificFields,
-        ...SELECTORS.sellOrRentSpecificFields,
+        ...SELECTORS.sellSpecificFields,
         ...SELECTORS.sellOrRentHouseAndAptFields,
         ...SELECTORS.landSpecificFields,
         ...SELECTORS.houseAndApartmentFields
@@ -90,7 +90,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         } else if (purpose === 'SELL' || purpose === 'RENT') {
             toggleVisibility(SELECTORS.buyRangeMinFields, false);
-            toggleVisibility(SELECTORS.sellOrRentSpecificFields, true);
             // Show build years ONLY for Sell or Rent for House/Apt
             if (type === 'HOUSE' || type === 'APARTMENT') {
                 toggleVisibility(SELECTORS.singleValueOrRangeMaxFields, true);
@@ -100,6 +99,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (purpose === 'RENT') {
             toggleVisibility(SELECTORS.rentSpecificFields, true);
+        }
+
+        if (purpose === 'SELL') {
+            toggleVisibility(SELECTORS.sellSpecificFields, true);
         }
 
         // --- FINAL OVERRIDE FOR LAND ---
