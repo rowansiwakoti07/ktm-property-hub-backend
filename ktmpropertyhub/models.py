@@ -245,13 +245,46 @@ class PropertyListing(models.Model):
     parking_bike_min = models.PositiveIntegerField(blank=True, null=True, help_text="Minimum bike parking.")
     parking_bike = models.PositiveIntegerField(blank=True, null=True)
     
-    # --- Rental Specific Fields ---
-    rent_duration_value = models.PositiveIntegerField(blank=True, null=True)
-    rent_duration_unit = models.CharField(max_length=10, choices=[('MONTHS', 'Months'), ('YEARS', 'Years')], blank=True, null=True)
-    rent_period = models.CharField(max_length=10, choices=[('MONTHLY', 'Monthly'), ('YEARLY', 'Yearly')], blank=True, null=True)
 
-    # --- THE HYBRID MODEL FOR FACILITIES (Structured + Flexible) ---
+    rent_available_duration = models.PositiveIntegerField("Rent Available Duration", null=True, blank=True)
     
+    class RentDurationUnit(models.TextChoices):
+        MONTHS = 'MONTHS', 'Months'
+        YEARS = 'YEARS', 'Years'
+
+    rent_available_duration_unit = models.CharField(
+        "Unit",
+        max_length=10, 
+        choices=RentDurationUnit.choices, 
+        blank=True, 
+        null=True
+    )
+
+    rent_amount = models.DecimalField(max_digits=14, decimal_places=2, blank=True, null=True)
+    
+    class RentPeriod(models.TextChoices):
+        MONTHLY = 'MONTHLY', 'Per Month'
+        YEARLY = 'YEARLY', 'Per Year'
+        
+    rent_period = models.CharField(
+        max_length=10, 
+        choices=RentPeriod.choices, 
+        blank=True, 
+        null=True
+    )
+
+    class RentNegotiability(models.TextChoices):
+        FIXED = 'FIXED', 'Fixed'
+        NEGOTIABLE = 'NEGOTIABLE', 'Negotiable'
+        
+    rent_negotiable = models.CharField(
+        max_length=10, 
+        choices=RentNegotiability.choices, 
+        blank=True, 
+        null=True, 
+        default='FIXED' # Set the default as requested
+    )
+
     # 1. FOR PREDEFINED FACILITIES (The Checklist/Dropdown)
     facilities = models.ManyToManyField(
         Facility, 
