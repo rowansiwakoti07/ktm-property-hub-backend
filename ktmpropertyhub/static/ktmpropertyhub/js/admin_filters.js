@@ -1,4 +1,3 @@
-// Wait for the entire DOM to be loaded before running the script
 document.addEventListener('DOMContentLoaded', function () {
     // We are in the Django admin, so the IDs are predictable
     const stateSelect = document.querySelector('#id_state');

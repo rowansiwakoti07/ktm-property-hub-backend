@@ -1,4 +1,3 @@
-// Wait for the DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function () {
     // --- 1. CONFIGURATION ---
     const SELECTORS = {
@@ -100,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 toggleVisibility(SELECTORS.sellOrRentHouseAndAptFields, true);
             }
         }
-        
+
         if (purpose === 'BUY' || purpose === 'SELL') {
             toggleVisibility(SELECTORS.buyOrSellSpecificFields, true);
         }

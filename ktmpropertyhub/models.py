@@ -5,9 +5,6 @@ from django.utils.text import slugify
 import time
 
 
-# ==============================================================================
-# NEW MODELS FOR STATE AND DISTRICT
-# ==============================================================================
 class State(models.Model):
     """
     Stores a state of Nepal (e.g., Bagmati, Gandaki).
@@ -87,7 +84,6 @@ class PropertyListing(models.Model):
     local_area = models.CharField(max_length=255, blank=True, null=True, help_text="Specific local area, neighborhood, or municipality.")
 
     # --- Price ---
-    # For 'Sell'/'Rent', we can use just 'price_max'. For 'Buy', use both.
     price_min = models.DecimalField(max_digits=14, decimal_places=2, blank=True, null=True, help_text="Minium price of the property.")
     price = models.DecimalField(max_digits=14, decimal_places=2, blank=True, null=True)
     
@@ -215,7 +211,7 @@ class PropertyListing(models.Model):
     floors_min = models.PositiveIntegerField(blank=True, null=True, help_text="Minimum floors")
     floors = models.PositiveIntegerField(blank=True, null=True)
 
-    # Room Details (using min/max for 'Buy' requests)
+    # Room Details
     master_bedrooms_min = models.PositiveIntegerField(blank=True, null=True, help_text="Minimum master bedrooms.")
     master_bedrooms = models.PositiveIntegerField(blank=True, null=True)
     common_bedrooms_min = models.PositiveIntegerField(blank=True, null=True, help_text="Minimum common bedrooms.")
@@ -286,10 +282,6 @@ class PropertyListing(models.Model):
     class Meta:
         ordering = ['-created_at']
 
-
-# ==============================================================================
-# NEW MODEL FOR HANDLING PROPERTY IMAGES
-# ==============================================================================
 
 class PropertyImage(models.Model):
     """
