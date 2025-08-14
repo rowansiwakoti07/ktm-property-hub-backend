@@ -5,8 +5,6 @@ document.addEventListener('DOMContentLoaded', function () {
         purpose: '#id_listing_purpose',
         propertyType: '#id_property_type',
 
-        priceFieldset: ['.price-fieldset'], // Target the entire Price section
-        rentFieldset: ['.rent-fieldset'],   // Target the entire Rent section
 
         buyRangeMinFields: [
             '.field-price_min', '.field-road_size_min_ft', '.field-floors_min',
@@ -19,6 +17,9 @@ document.addEventListener('DOMContentLoaded', function () {
             '.field-master_bedrooms', '.field-common_bedrooms',
             '.field-common_bathrooms', '.field-living_rooms',
             '.field-kitchens', '.field-built_up_area_sqft', '.field-parking_car', '.field-parking_bike'
+        ],
+        rentSpecificFields: [
+            '.field-rent_available_duration_unit', '.field-rent_amount', '.field-frequency'
         ],
         sellOrRentSpecificFields: [
             '.field-price_negotiable'
@@ -35,8 +36,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Create a master list of all fields we control for the reset step.
     const allControlledSelectors = Array.from(new Set([
-        ...SELECTORS.priceFieldset,
-        ...SELECTORS.rentFieldset,
         ...SELECTORS.buyRangeMinFields,
         ...SELECTORS.singleValueOrRangeMaxFields,
         ...SELECTORS.rentSpecificFields,
@@ -85,22 +84,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // --- Rules based on Listing Purpose ---
         if (purpose === 'BUY') {
-            toggleVisibility(SELECTORS.priceFieldset, true); // Show Price section
-            toggleVisibility(SELECTORS.buyRangeMinFields, true); // Show _min fields
-            // Ensure single/max fields are visible for the range
+            toggleVisibility(SELECTORS.buyRangeMinFields, true);
             if (type === 'HOUSE' || type === 'APARTMENT') {
                 toggleVisibility(SELECTORS.singleValueOrRangeMaxFields, true);
             }
-        } else if (purpose === 'SELL') {
-            toggleVisibility(SELECTORS.priceFieldset, true); // Show Price section
-            toggleVisibility(SELECTORS.buyRangeMinFields, false); // Hide _min fields
+        } else if (purpose === 'SELL' || purpose === 'RENT') {
+            toggleVisibility(SELECTORS.buyRangeMinFields, false);
             toggleVisibility(SELECTORS.sellOrRentSpecificFields, true);
+            // Show build years ONLY for Sell or Rent for House/Apt
             if (type === 'HOUSE' || type === 'APARTMENT') {
                 toggleVisibility(SELECTORS.singleValueOrRangeMaxFields, true);
                 toggleVisibility(SELECTORS.sellOrRentHouseAndAptFields, true);
             }
-        } else if (purpose === 'RENT') {
-            toggleVisibility(SELECTORS.rentFieldset, true); // Show RENT section instead of Price
+        }
+
+        if (purpose === 'RENT') {
+            toggleVisibility(SELECTORS.rentSpecificFields, true);
         }
 
         // --- FINAL OVERRIDE FOR LAND ---
