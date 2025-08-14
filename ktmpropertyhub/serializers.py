@@ -44,8 +44,8 @@ class PropertyListingSerializer(serializers.ModelSerializer):
         # We list all fields to be explicit about what our API exposes
         fields = [
             'id', 'listing_purpose', 'property_type', 'user', 'title', 
-            'description', 'created_at', 'updated_at', 'is_active', 'state', 
-            'district', 'local_area', 'price_min', 'price', 'price_negotiable',
+            'description', 'created_at', 'updated_at', 'is_active',
+            'local_area', 'price_min', 'price', 'price_negotiable',
             'road_size_min_ft', 'road_size_ft', 'road_condition', 'facing_direction',
             'land_type', 'property_condition', 'built_year_bs', 'built_year_ad',
             'floors_min', 'floors', 'master_bedrooms_min', 'master_bedrooms',
@@ -53,9 +53,55 @@ class PropertyListingSerializer(serializers.ModelSerializer):
             'common_bathrooms', 'living_rooms_min', 'living_rooms',
             'kitchens_min', 'kitchens', 'built_up_area_min_sqft', 'built_up_area_sqft', 'has_laundry', 'has_store',
             'has_puja_room', 'furnishing', 'parking_car_min', 'parking_car',
-            'parking_bike_min', 'parking_bike', 'rent_available_duration_unit',
-            'rent_amount', 'frequency',
+            'parking_bike_min', 'parking_bike', 'rent_available_duration',
+            'rent_available_duration_unit', 'rent_amount', 'frequency',
             'facilities', 'images', 'state', 'district', 'state_id', 'district_id',
             'ropani', 'aana', 'paisa', 'dam',
             'bigha', 'katha', 'dhur', 'total_land_area_sqft',
         ]
+
+class PropertyListingCreateSerializer(serializers.ModelSerializer):
+    """
+    A dedicated serializer for CREATING new PropertyListing instances.
+    It's designed to accept IDs for foreign keys and perform validation.
+    """
+    # The user will be set automatically from the request, not sent in the payload.
+    # We make it a read-only field in the context of this serializer.
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
+
+    # We expect the frontend to send a list of IDs for the facilities.
+    facilities = serializers.PrimaryKeyRelatedField(
+        queryset=Facility.objects.all(), 
+        many=True, 
+        required=False
+    )
+    
+    class Meta:
+        model = PropertyListing
+        # We explicitly list all fields that a user is allowed to submit
+        # when creating a property. We exclude read-only fields like 'created_at'.
+        fields = [
+            'listing_purpose', 'property_type', 'user', 'title', 'description', 
+            'is_active', 'state', 'district', 'local_area', 'price_min', 
+            'price', 'price_negotiable',
+            'ropani', 'aana', 'paisa', 'dam',
+            'bigha', 'katha', 'dhur',
+            'road_size_min_ft', 'road_size_ft', 'road_condition', 'facing_direction',
+            'land_type', 'property_condition', 'built_year_bs', 'built_year_ad',
+            'floors_min', 'floors', 'master_bedrooms_min', 'master_bedrooms',
+            'common_bedrooms_min', 'common_bedrooms', 'common_bathrooms_min',
+            'common_bathrooms', 'living_rooms_min', 'living_rooms',
+            'kitchens_min', 'kitchens', 'built_up_area_min_sqft', 'built_up_area_sqft',
+            'has_laundry', 'has_store', 'has_puja_room', 'furnishing', 
+            'parking_car_min', 'parking_car', 'parking_bike_min', 'parking_bike', 
+            'rent_available_duration', 'rent_available_duration_unit',
+            'rent_amount', 'frequency', 'facilities', 'images', 'total_land_area_sqft'
+        ]
+
+    def create(self, validated_data):
+        """
+        Override the create method to set the user from the request context.
+        """
+        # We get the user from the context that we will pass in from the view
+        validated_data['user'] = self.context['request'].user
+        return super().create(validated_data)

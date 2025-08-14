@@ -1,7 +1,7 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, permissions, mixins
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import PropertyListing, State, District
-from .serializers import PropertyListingSerializer, StateSerializer, DistrictSerializer
+from .serializers import PropertyListingSerializer, StateSerializer, DistrictSerializer, PropertyListingCreateSerializer
 from django_filters import rest_framework as filters
 
 class StateViewSet(viewsets.ReadOnlyModelViewSet):
@@ -50,3 +50,38 @@ class PropertyListingViewSet(viewsets.ReadOnlyModelViewSet):
 
     # Use our new custom filter class
     filterset_class = PropertyFilter # GET /api/properties/?min_sqft=1000&max_sqft=2000
+
+
+class AddPropertyViewSet(
+    mixins.CreateModelMixin,   # Provides the .create() action
+    mixins.ListModelMixin,     # Provides .list() to see your own properties
+    mixins.RetrieveModelMixin, # Provides .retrieve() to see one of your properties
+    mixins.UpdateModelMixin,   # Provides .update() and .partial_update()
+    mixins.DestroyModelMixin,  # Provides .destroy()
+    viewsets.GenericViewSet
+):
+    """
+    A secure ViewSet for allowing authenticated users to manage their OWN
+    property listings.
+    """
+    # Use the new serializer for creating/writing data
+    serializer_class = PropertyListingCreateSerializer
+    
+    # --- THIS IS THE CRITICAL SECURITY RULE ---
+    # This ensures that only logged-in users can access this endpoint.
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        """
+        This is the magic. This view will ONLY ever show the listings
+        that belong to the currently logged-in user.
+        """
+        return PropertyListing.objects.filter(user=self.request.user)
+
+    def get_serializer_context(self):
+        """
+
+        Pass the request object to the serializer's context. This is crucial
+        for the serializer to be able to access the logged-in user.
+        """
+        return {'request': self.request}
