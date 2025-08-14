@@ -54,7 +54,7 @@ class PropertyListingSerializer(serializers.ModelSerializer):
             'kitchens_min', 'kitchens', 'built_up_area_min_sqft', 'built_up_area_sqft', 'has_laundry', 'has_store',
             'has_puja_room', 'furnishing', 'parking_car_min', 'parking_car',
             'parking_bike_min', 'parking_bike', 'rent_available_duration_unit',
-            'rent_amount', 'rent_period', 'rent_negotiable',
+            'rent_amount', 'frequency', 'rent_negotiable',
             'facilities', 'images', 'state', 'district', 'state_id', 'district_id',
             'ropani', 'aana', 'paisa', 'dam',
             'bigha', 'katha', 'dhur', 'total_land_area_sqft',

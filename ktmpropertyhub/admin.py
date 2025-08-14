@@ -50,7 +50,7 @@ class PropertyListingAdmin(admin.ModelAdmin):
             'classes': ('rent-fieldset',),
             'fields': (
                 ('rent_available_duration', 'rent_available_duration_unit'),
-                ('rent_amount', 'rent_period'),
+                ('rent_amount', 'frequency'),
                 'rent_negotiable'
             )
         }),

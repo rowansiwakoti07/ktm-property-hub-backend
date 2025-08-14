@@ -266,7 +266,7 @@ class PropertyListing(models.Model):
         MONTHLY = 'MONTHLY', 'Per Month'
         YEARLY = 'YEARLY', 'Per Year'
         
-    rent_period = models.CharField(
+    frequency = models.CharField(
         max_length=10, 
         choices=RentPeriod.choices, 
         blank=True, 
