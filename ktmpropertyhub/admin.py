@@ -51,7 +51,6 @@ class PropertyListingAdmin(admin.ModelAdmin):
             'fields': (
                 ('rent_available_duration', 'rent_available_duration_unit'),
                 ('rent_amount', 'frequency'),
-                'rent_negotiable'
             )
         }),
         ('Land Size', {
@@ -94,9 +93,6 @@ class PropertyListingAdmin(admin.ModelAdmin):
         form.base_fields['bigha'].widget.attrs.update(terai_attrs)
         form.base_fields['katha'].widget.attrs.update(terai_attrs)
         form.base_fields['dhur'].widget.attrs.update(terai_attrs)
-
-        # Make rent_negotiable render as radio buttons
-        form.base_fields['rent_negotiable'].widget = forms.RadioSelect()
 
         # make it an actual input that JS can target/update, but not user-editable
         form.base_fields['total_land_area_sqft'].widget.attrs.update({'readonly': 'readonly'})

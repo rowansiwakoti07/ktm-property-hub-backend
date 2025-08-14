@@ -273,18 +273,6 @@ class PropertyListing(models.Model):
         null=True
     )
 
-    class RentNegotiability(models.TextChoices):
-        FIXED = 'FIXED', 'Fixed'
-        NEGOTIABLE = 'NEGOTIABLE', 'Negotiable'
-        
-    rent_negotiable = models.CharField(
-        max_length=10, 
-        choices=RentNegotiability.choices, 
-        blank=True, 
-        null=True, 
-        default='FIXED' # Set the default as requested
-    )
-
     # 1. FOR PREDEFINED FACILITIES (The Checklist/Dropdown)
     facilities = models.ManyToManyField(
         Facility, 
