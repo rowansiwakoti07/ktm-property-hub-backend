@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function () {
             '.field-kitchens_min', '.field-built_up_area_min_sqft', '.field-parking_car_min', '.field-parking_bike_min'
         ],
         singleValueOrRangeMaxFields: [
-            '.field-price', '.field-road_size_ft', '.field-floors',
+            '.field-road_size_ft', '.field-floors',
             '.field-master_bedrooms', '.field-common_bedrooms',
             '.field-common_bathrooms', '.field-living_rooms',
             '.field-kitchens', '.field-built_up_area_sqft', '.field-parking_car', '.field-parking_bike'
@@ -23,6 +23,9 @@ document.addEventListener('DOMContentLoaded', function () {
         ],
         sellSpecificFields: [
             '.field-price_negotiable'
+        ],
+        buyOrSellSpecificFields: [
+            '.field-price'
         ],
         sellOrRentHouseAndAptFields: [
             '.field-built_year_bs', '.field-built_year_ad'
@@ -40,6 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
         ...SELECTORS.singleValueOrRangeMaxFields,
         ...SELECTORS.rentSpecificFields,
         ...SELECTORS.sellSpecificFields,
+        ...SELECTORS.buyOrSellSpecificFields,
         ...SELECTORS.sellOrRentHouseAndAptFields,
         ...SELECTORS.landSpecificFields,
         ...SELECTORS.houseAndApartmentFields
@@ -95,6 +99,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 toggleVisibility(SELECTORS.singleValueOrRangeMaxFields, true);
                 toggleVisibility(SELECTORS.sellOrRentHouseAndAptFields, true);
             }
+        }
+        
+        if (purpose === 'BUY' || purpose === 'SELL') {
+            toggleVisibility(SELECTORS.buyOrSellSpecificFields, true);
         }
 
         if (purpose === 'RENT') {
