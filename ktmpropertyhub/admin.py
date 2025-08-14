@@ -40,14 +40,12 @@ class PropertyListingAdmin(admin.ModelAdmin):
             'fields': ('state', 'district', 'local_area')
         }),
         ('Price (For Sale/Buy)', {
-            'classes': ('price-fieldset',),
             'fields': ('price_min', 'price', 'price_negotiable')
         }),
         ('Property Details', {
             'fields': ('land_type', 'facing_direction', 'property_condition', 'built_year_bs', 'built_year_ad', 'floors_min', 'floors', 'master_bedrooms_min', 'master_bedrooms', 'common_bedrooms_min', 'common_bedrooms', 'common_bathrooms_min', 'common_bathrooms', 'living_rooms_min', 'living_rooms', 'kitchens_min', 'kitchens', 'built_up_area_min_sqft', 'built_up_area_sqft')
         }),
         ('Rental Information', {
-            'classes': ('rent-fieldset',),
             'fields': (
                 ('rent_available_duration', 'rent_available_duration_unit'),
                 ('rent_amount', 'frequency'),
