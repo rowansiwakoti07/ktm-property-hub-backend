@@ -1,6 +1,3 @@
-# ktmpropertyhub/ktmpropertyhub/urls.py
-# This is now the single, main URL configuration for your entire project.
-
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
@@ -26,4 +23,8 @@ urlpatterns = [
     # 2. The URLs for your API, nested under the '/api/' path
     # This will include '/api/properties/', '/api/properties/<id>/', etc.
     path('api/', include(router.urls)),
+
+    # --- SECURE AUTHENTICATION ENDPOINTS ---
+    path('api/auth/', include('dj_rest_auth.urls')),
+    path('api/auth/registration/', include('dj_rest_auth.registration.urls')),
 ]

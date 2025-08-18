@@ -27,6 +27,9 @@ SECRET_KEY = 'django-insecure-w0v@u!*g-i5xcrh21=nmu!d(y&ixd&9c(vuj$2#do3y1_aa-4#
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# This is required by dj-rest-auth
+SITE_ID = 1
+
 ALLOWED_HOSTS = [
     'www.ktmpropertyhub.com',
     '.vercel.app',
@@ -57,7 +60,12 @@ INSTALLED_APPS = [
     'ktmpropertyhub',
     'rest_framework',
     'django_filters',
-    'multiupload'
+    'multiupload',
+
+    # --- APPS FOR AUTHENTICATION ---
+    'rest_framework.authtoken', # Needed by dj-rest-auth
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
 ]
 
 MIDDLEWARE = [
@@ -71,6 +79,42 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+REST_FRAMEWORK = {
+    # --- AUTHENTICATION CONFIGURATION ---
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+# --- DJ-REST-AUTH AND SIMPLE-JWT CONFIGURATION ---
+
+# We will use JWT for authentication
+REST_AUTH = {
+    'USE_JWT': True,
+    'JWT_AUTH_HTTPONLY': False, # Allow JWT to be accessed by JS in the browser
+}
+
+# This configures the behavior of your JWTs
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15), # Short-lived access tokens are more secure
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),   # Long-lived refresh tokens
+    'ROTATE_REFRESH_TOKENS': True, # For added security, a new refresh token is issued each time one is used
+    'BLACKLIST_AFTER_ROTATION': True, # Invalidates the old refresh token
+    'UPDATE_LAST_LOGIN': True,
+
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY, # Uses your project's secret key
+    'VERIFYING_KEY': None,
+    'AUDIENCE': None,
+    'ISSUER': None,
+
+    'AUTH_HEADER_TYPES': ('Bearer',), # Expects 'Authorization: Bearer <token>'
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+}
 
 ROOT_URLCONF = 'ktmpropertyhub.urls'
 
