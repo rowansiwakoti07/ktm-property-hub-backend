@@ -64,9 +64,49 @@ INSTALLED_APPS = [
 
     # --- APPS FOR AUTHENTICATION ---
     'rest_framework.authtoken', # Needed by dj-rest-auth
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount', # Optional, but good to have for future social login
     'dj_rest_auth',
     'dj_rest_auth.registration',
 ]
+
+
+# --- DJANGO-ALLAUTH CONFIGURATION ---
+# This is a minimal configuration to get registration working.
+# You must specify the authentication backends
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend', # Default Django auth
+    'allauth.account.auth_backends.AuthenticationBackend', # allauth specific auth
+)
+
+# This setting defines how a user can log in.
+ACCOUNT_LOGIN_METHODS = ['username', 'email']
+
+# This setting defines which fields are presented on the registration form.
+# The '*' indicates that the field is required.
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*']
+
+# Email verification setting for registration
+ACCOUNT_EMAIL_VERIFICATION = 'optional' # Change to 'mandatory' for production
+
+# --- These are good defaults to have as well ---
+# Prevents users from registering with usernames that are already in use
+ACCOUNT_UNIQUE_USERNAME = True
+# Prevents users from registering with email addresses that are already in use
+ACCOUNT_UNIQUE_EMAIL = True
+
+# This is a security feature. When a user logs in, their session from any other
+# browser or device will be logged out.
+ACCOUNT_SESSION_REMEMBER = None
+ACCOUNT_LOGOUT_ON_PASSWORD_CHANGE = True
+
+# This specifies that for registration, the user MUST provide an email.
+# The 'username' is also required by default.
+# NOTe: We do not need to specify 'password' here. allauth handles that automatically.
+ACCOUNT_FORMS = {
+    'signup': 'allauth.account.forms.SignupForm',
+}
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -78,6 +118,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 REST_FRAMEWORK = {
