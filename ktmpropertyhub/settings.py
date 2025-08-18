@@ -13,13 +13,11 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 from decouple import config
 import os
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-w0v@u!*g-i5xcrh21=nmu!d(y&ixd&9c(vuj$2#do3y1_aa-4#'
@@ -101,12 +99,29 @@ ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_SESSION_REMEMBER = None
 ACCOUNT_LOGOUT_ON_PASSWORD_CHANGE = True
 
+# Automatically log in the user after they confirm their email.
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
+
 # This specifies that for registration, the user MUST provide an email.
 # The 'username' is also required by default.
 # NOTe: We do not need to specify 'password' here. allauth handles that automatically.
 ACCOUNT_FORMS = {
     'signup': 'allauth.account.forms.SignupForm',
 }
+
+# Security: Prevent User Enumeration Attacks
+# This is a critical security setting. It makes it harder for attackers to guess valid usernames/emails.
+ACCOUNT_PREVENT_ENUMERATION = True
+
+# Email Configuration (Essential for password reset and verification)
+# In your .env file, you MUST set up these variables with a service like SendGrid, Mailgun, or Gmail.
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = config('EMAIL_HOST', default='localhost')
+# EMAIL_PORT = config('EMAIL_PORT', default=25, cast=int)
+# EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=False, cast=bool)
+# EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
+# EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+# DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='webmaster@localhost')
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -136,8 +151,10 @@ REST_AUTH = {
     'JWT_AUTH_HTTPONLY': False, # Allow JWT to be accessed by JS in the browser
 }
 
-# This configures the behavior of your JWTs
-from datetime import timedelta
+# Session Management
+# We set this to False because in a stateless JWT API, the "Remember Me"
+# checkbox logic is handled by the frontend storing the refresh token.
+ACCOUNT_SESSION_REMEMBER = False
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15), # Short-lived access tokens are more secure
